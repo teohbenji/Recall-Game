@@ -1,0 +1,149 @@
+//the regfile for all game information
+module game_miniRegfiles (
+    input clk,  // clock
+    input rst,  // reset
+    input write_address[4], // write address Rc
+    input we, // write enable
+    input data[16], // data in
+    
+    
+    input read_address_a[4], //address port a 
+    input read_address_b[4], //address port b
+    output out_a[16], //read port a
+    output out_b[16], //read port b
+    
+    output cmsel[2], //permanent read port
+    output ysel[3],  //permanent read port
+    output xsel[3],  //permanent read port
+    output map_gen1[4],
+    output map_gen2[4],
+    output map_gen3[4],
+    output points[16],
+    output timer[16],
+    output mem_trail1[16],
+    output mem_trail2[16],
+    output mem_trail3[16],
+    output mem_trail4[16],
+    output mem_trail5[16],
+    output mem_trail6[16]
+    
+    
+    //debug
+    //output timer[16],
+    //output all_scores[32],
+    //output all_buttons[4],
+    //output counter_out[16]
+
+  ) {
+  .clk(clk){
+    .rst(rst){
+      dff score[16](#INIT(0));
+      dff player_pos_x[16](#INIT(0));
+      dff player_pos_y[16](#INIT(0));
+      dff random_maps[16](#INIT(0));
+      dff correct_map_index[16](#INIT(0));
+      dff current_timer_mapdisplay[16](#INIT(0));
+      dff led_row1[16](#INIT(0));
+      dff led_row2[16](#INIT(0));
+      dff led_row3[16](#INIT(0));
+      dff led_row4[16](#INIT(0));
+      dff led_row5[16](#INIT(0));
+      dff led_row6[16](#INIT(0));
+      dff current_timer_gameplay[16](#INIT(0));
+      dff branch_temp_var[16](#INIT(0));
+    }
+  }
+
+  always {
+  
+    cmsel = correct_map_index.q[1:0]; ///YASS
+    xsel = player_pos_x.q[2:0];
+    ysel = player_pos_y.q[2:0];
+    map_gen1 = random_maps.q[3:0];
+    map_gen2 = random_maps.q[7:4];
+    map_gen3 = random_maps.q[11:8];
+    points = score.q;
+    timer = current_timer_gameplay.q;
+    
+    mem_trail1 = led_row1.q;
+    mem_trail2 = led_row2.q;
+    mem_trail3 = led_row3.q;
+    mem_trail4 = led_row4.q;
+    mem_trail5 = led_row5.q;
+    mem_trail6 = led_row6.q;
+
+
+    
+    
+    
+    
+  
+    //write port
+    if (we){
+      case(write_address){
+        b0000 : score.d = data;
+        b0001 : player_pos_x.d = data;
+        b0010 : player_pos_y.d = data;
+        b0011 : random_maps.d = data;
+        b0100 : correct_map_index.d = data;
+        b0101 : current_timer_mapdisplay.d = data;
+        b0110 : led_row1.d = data;
+        b0111 : led_row2.d = data;
+        b1000 : led_row3.d = data;
+        b1001 : led_row4.d = data;
+        b1010 : led_row5.d = data;
+        b1011 : led_row6.d = data;
+        b1100 : current_timer_gameplay.d = data;
+        b1111 : branch_temp_var.d = data;
+      }
+    }
+    
+      
+    //read port a
+    case(read_address_a){
+        b0000 : out_a = score.q;
+        b0001 : out_a = player_pos_x.q;
+        b0010 : out_a = player_pos_y.q;
+        b0011 : out_a = random_maps.q;
+        b0100 : out_a = correct_map_index.q;
+        b0101 : out_a = current_timer_mapdisplay.q;
+        b0110 : out_a = led_row1.q;
+        b0111 : out_a = led_row2.q;
+        b1000 : out_a = led_row3.q;
+        b1001 : out_a = led_row4.q;
+        b1010 : out_a = led_row5.q;
+        b1011 : out_a = led_row6.q;
+        b1100 : out_a = current_timer_gameplay.q;
+        b1111 : out_a = branch_temp_var.q;
+        default : out_a = 0;
+    }
+    
+    //read port b
+    case(read_address_b){
+        b0000 : out_b = score.q;
+        b0001 : out_b = player_pos_x.q;
+        b0010 : out_b = player_pos_y.q;
+        b0011 : out_b = random_maps.q;
+        b0100 : out_b = correct_map_index.q;
+        b0101 : out_b = current_timer_mapdisplay.q;
+        b0110 : out_b = led_row1.q;
+        b0111 : out_b = led_row2.q;
+        b1000 : out_b = led_row3.q;
+        b1001 : out_b = led_row4.q;
+        b1010 : out_b = led_row5.q;
+        b1011 : out_b = led_row6.q;
+        b1100 : out_b = current_timer_gameplay.q;
+        b1111 : out_b = branch_temp_var.q;
+        default : out_b = 0;
+    }
+      
+    
+    //For debugging
+    //all_scores[15:0] = p1_score.q;
+    //all_scores[31:16] = p2_score.q;
+    //all_buttons[1:0] = p1_buttonPress.q[1:0];
+    //all_buttons[3:2] = p2_buttonPress.q[1:0];
+    //timer = current_timer.q;
+    //counter_out = current_counter.q;
+  }
+}

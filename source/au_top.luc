@@ -8,67 +8,67 @@ module au_top (
     output io_seg [8],      // 7-segment LEDs on IO Shield (ANODE)
     output io_sel [4],      // Digit select on IO Shield
     input io_button [5],    // 5 buttons on IO Shield
-    input io_dip [3][8]     // DIP switches on IO Shield
+    input io_dip [3][8],     // DIP switches on IO Shield
+    
+    //LED strips
+    output outled_1,
+    output outled_2,
+    output outled_3,
+    output outled_4,
+    output outled_5,
+    output outled_6
   ) {
   
   sig rst;                  // reset signal
-  alu alu;
+  //alu alu;
+  ws2812b ws2812b;
 
   .clk(clk) {
     // The reset conditioner is used to synchronize the reset signal to the FPGA
     // clock. This ensures the entire FPGA comes out of reset at the same time.
+    .rst(rst){
+      //multi_seven_seg segtimer;
+      game_miniBeta gameMachine;
+      
+    }
     reset_conditioner reset_cond;
-    dff a[32](.rst(rst));
-    dff b[32](.rst(rst));
-    dff alufn[6](.rst(rst));
-    button_conditioner button_conditioner[3];
-  }
+  } 
   
   always {
+    
     reset_cond.in = ~rst_n;   // input raw inverted reset signal
     rst = reset_cond.out;     // conditioned reset
-    button_conditioner.in = io_button[2:0];
+
     
-    led = c{3b0, io_button};  // connect buttons to LEDs to see which button is pressed
+    led = 8h00;             // turn LEDs off
+    
+    io_led = 3x{{8h00}};    // turn LEDs off
+    io_seg = 8hff;          // turn segments off
+    io_sel = 4hf;           // select no digits
     
     usb_tx = usb_rx;          // loop serial port
     
-    io_seg = 8b0; // connect segments to the driver
-    io_sel = 4b0110; // turn on rightmost digit, and leftmost digit
+    //LED strips 
+    ws2812b.clk = clk;
+    ws2812b.rst_n = rst_n;
+    ws2812b.usb_rx = usb_rx;
+    ws2812b.color = gameMachine.colseloutput;
+    ws2812b.action = b01;
     
-    alu.a = a.q;
-    alu.b = b.q;
-    alu.alufn_signal = alufn.q;
+    ws2812b.lit_leds_1 = gameMachine.inputledsel1;
+    ws2812b.lit_leds_2 = gameMachine.inputledsel2;
+    ws2812b.lit_leds_3 = gameMachine.inputledsel3;
+    ws2812b.lit_leds_4 = gameMachine.inputledsel4;
+    ws2812b.lit_leds_5 = gameMachine.inputledsel5;
+    ws2812b.lit_leds_6 = gameMachine.inputledsel6;
     
-    // ****** INPUT SETTING ****** //
-    // a very crude way of testing the alu manually
-    // TODO: change this to suit your needs
-    // press button[0] to store 'a' value based on current dipswitches 
-    // press button[1] to store 'b' value based on current dipswitches 
-    // bit[24:17] of a,b always set to 0 for convenience 
-    // press button[2] to store 'alufn' value based on io_dip[0][5:0] (6 rightmost dipswitch) 
-    if (button_conditioner.out[0]){
-       // store a 
-       a.d = c{io_dip[2], 8b0, io_dip[1], io_dip[0]}; // set io_dip[2] to dictate MSB 8 bits
-    }
     
-    if (button_conditioner.out[1]){
-       // store b 
-      b.d = c{io_dip[2], 8b0, io_dip[1], io_dip[0]}; // set io_dip[2] to dictate MSB 8 bits
-    }
-    
-    if (button_conditioner.out[2]){
-      // store alufn
-      alufn.d = io_dip[0][5:0];
-    }
-
-    // ****** OUTPUT SETTING ****** //
-    // TODO: change this to suit your needs
-    // io_led[0] shows the lowest 8 bit of ALU output at all times
-    // io_led[1] shows the highest 8 bit of ALU output at all times
-    // io_led[2][2:0] shows z,v,n at all times
-    io_led = c{{c{5b0, alu.z, alu.v, alu.n}}, {alu.out[15:8]}, {alu.out[7:0]}};
-    //io_led = c{{c{3b0,b1,b1, alu.z, alu.v, alu.n}}, {c{8b1}}, {c{8b1}}};   
+    outled_1 = ws2812b.outled_1;
+    outled_2 = ws2812b.outled_2; 
+    outled_3 = ws2812b.outled_3; 
+    outled_4 = ws2812b.outled_4; 
+    outled_5 = ws2812b.outled_5; 
+    outled_6 = ws2812b.outled_6;
 
   }
 }

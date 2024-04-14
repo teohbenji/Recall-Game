@@ -1,0 +1,290 @@
+module game_miniBeta (
+    /*
+    input up_button,
+    input down_button,
+    input right_button,
+    input left_button,
+    input start_button,
+    input reset_button,
+    */
+    
+    
+    input clk,  // clock
+    input rst,  // reset
+    
+    //output debug_out[16],
+    //output p1_out[16],
+    //output p2_out[16],
+    //output debug_slowclock,
+    //output debug_vcclock,
+   
+    
+    output points[16],
+    //output timer[16],
+    output inputledsel1[6],
+    output inputledsel2[6],
+    output inputledsel3[6],
+    output inputledsel4[6],
+    output inputledsel5[6],
+    output inputledsel6[6],
+    output colseloutput[2]
+
+    //output decimal_counter_increase,
+    //output decimal_counter_rst
+  ) {
+  
+  //temp variables
+  sig inputAlu_a[16];
+  sig inputAlu_b[16];
+  sig inputcmsel[4];
+  sig inputRomsel[6];
+  sig yseloutput[6];
+  sig xseloutput[1];
+  sig outseloutput[36];
+  
+
+  
+  
+  
+  alu game_alu;
+  pn_gen rand(.clk(clk),.rst(rst));
+  rom rom;
+  game_CU game_controlunit(.clk(clk),.rst(rst));
+  game_miniRegfiles players(.clk(clk),.rst(rst));
+  
+  /*
+ .clk(clk){
+    //edge_detector game_timer_detector(#RISE(1), #FALL(0));
+    
+    .rst(rst){
+      game_CU game_controlunit;
+      game_miniRegfiles players;
+      
+      //counter slow_timer(#SIZE(1),#DIV(26)); 
+
+    }
+  }
+  */
+  always {
+    rand.seed=16hABCD;
+    rand.next=1;
+    
+  
+    points = players.points;
+    //timer = players.timer;
+    
+    //edge detectors
+    //game_timer_detector.in = slow_timer.value; // 30 second timer detector
+    
+    //pass timer and counter signals to CU unit 
+    // detects slow clock rise and 
+    //game_controlunit.decrease_timer = game_timer_detector.out;
+    
+    //pass buttons press signal to CU unit
+    /*
+    game_controlunit.up_button = up_button;
+    game_controlunit.down_button = down_button;
+    game_controlunit.right_button = right_button;
+    game_controlunit.left_button = left_button;
+    game_controlunit.start_button= start_button;
+    game_controlunit.reset_button= reset_button;
+    */
+    
+    //output of CU to increase 7segment
+    //decimal_counter_increase = game_controlunit.decimal_counter_increase;
+    //decimal_counter_rst = game_controlunit.decimal_counter_rst;
+    
+    //Setup REGFILE unit 
+    players.we = game_controlunit.we_regfile;
+    players.write_address = game_controlunit.regfile_write_address;
+   
+    players.read_address_a = game_controlunit.regfile_read_address_a;
+    players.read_address_b = game_controlunit.regfile_read_address_b;
+    
+    //bootstrap reg_b output to CU for convenient branching conditions
+    game_controlunit.regfile_datain = players.out_b;
+    
+    //asel mux
+    case(game_controlunit.asel){
+      b0000 : inputAlu_a = players.out_a;
+      b0001 : inputAlu_a = rand.num[1:0];
+      b0010 : inputAlu_a = rand.num[15:0];
+      b0011 : inputAlu_a = b0001;
+      b0100 : inputAlu_a = b0011;
+      b0101 : inputAlu_a = b0101;
+      b0110 : inputAlu_a = b0111;
+      b0111 : inputAlu_a = b1010;
+      b1000 : inputAlu_a = b00111100;
+      b1001 : inputAlu_a = 0;
+      default : //b10 unused
+          inputAlu_a = players.out_a;
+    }
+    
+    //bsel mux
+    case(game_controlunit.bsel){
+      b0000 : inputAlu_b = players.out_b;
+      b0001 : inputAlu_b = b0 ;
+      b0010 : inputAlu_b = b1;
+      b0011 : inputAlu_b = b10;
+      b0100 : inputAlu_b = b11;
+      b0101 : inputAlu_b = b100;
+      b0110 : inputAlu_b = b101;
+      b0111 : inputAlu_b = b110;
+      b1000 : inputAlu_b = b111;
+      default: //necessary to init
+          inputAlu_b = players.out_b;
+      
+    }
+    
+    //ALU
+    game_alu.a = inputAlu_a;
+    game_alu.b = inputAlu_b;
+    game_alu.alufn_signal = game_controlunit.alufn;
+   
+
+    
+    //ysel mux
+    case (players.ysel){
+      b000 : yseloutput = rom.value[5:0];
+      b001 : yseloutput = rom.value[11:6] ;
+      b010 : yseloutput = rom.value[17:12];
+      b011 : yseloutput = rom.value[23:18] ;
+      b100 : yseloutput = rom.value[29:24] ;
+      b101 : yseloutput = rom.value[35:30] ;
+      default : //b???
+          yseloutput = 0;
+    }
+        
+    //xsel mux
+    case (players.xsel){
+      b000 : xseloutput = yseloutput[0];
+      b001 : xseloutput = yseloutput[1];
+      b010 : xseloutput = yseloutput[2];
+      b011 : xseloutput = yseloutput[3];
+      b100 : xseloutput = yseloutput[4];
+      b101 : xseloutput = yseloutput[5];
+      default : //b00
+          xseloutput = 0;
+    }
+    
+    //outsel mux
+    case (game_controlunit.outsel){
+      b00 : outseloutput = xseloutput;
+      b01 : outseloutput = rom.value[35:0];
+      b10 : outseloutput = rom.value[38:36]; //end x
+      b11 : outseloutput = rom.value[41:39]; //end y
+      default : //b00
+          outseloutput = 0 ;
+    }
+    
+    //wdsel mux
+    case (game_controlunit.wdsel){
+      b00 : players.data = game_alu.out;
+      b01 : players.data = outseloutput;
+      default : //b00
+          players.data = 0;
+    }
+    
+    //cmsel mux
+    case(players.cmsel){ 
+      b00 : inputcmsel = players.map_gen1;
+      b01 : inputcmsel = players.map_gen2;
+      b10 : inputcmsel = players.map_gen3;
+      b11 : inputcmsel = players.map_gen3;
+
+      default: //necessary to init
+          inputcmsel = players.map_gen3; 
+    }
+    
+    //romsel mux
+      case(game_controlunit.romsel){ 
+        b000 : rom.address = inputcmsel;
+        b001 : rom.address = players.map_gen1;
+        b010 : rom.address = players.map_gen2;
+        b011 : rom.address = players.map_gen3;
+        b100 : rom.address = b00010000; //rom16
+        b101 : rom.address = b00010001; //rom17
+        b110 : rom.address = b00010010;  // rom18
+        b111 : rom.address = b00010011;  //rom19
+
+        default: //necessary to init
+            rom.address = inputcmsel; 
+    }
+    
+    //1 led mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel1 = outseloutput[5:0];
+        b01 : inputledsel1 = players.mem_trail1;
+        default: //necessary to init
+            inputledsel1 = 0; 
+    }
+    
+    // 2 ledsel mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel2 = outseloutput[11:6];
+        b01 : inputledsel2 = players.mem_trail2;
+        default: //necessary to init
+            inputledsel2 = 0; 
+    }
+    
+    // 3 ledsel mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel3 = outseloutput[17:12];
+        b01 : inputledsel3 = players.mem_trail3;
+        default: //necessary to init
+            inputledsel3 = 0; 
+    }
+    
+    //4 ledsel mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel4 = outseloutput[23:18];
+        b01 : inputledsel4 = players.mem_trail4;
+        default: //necessary to init
+            inputledsel4 = 0; 
+    }
+    
+    //5 ledsel mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel5 = outseloutput[29:24];
+        b01 : inputledsel5 = players.mem_trail5;
+        default: //necessary to init
+            inputledsel5 = 0; 
+    }
+    
+    //6 ledsel mux  
+    case(game_controlunit.ledsel){ 
+        b00 : inputledsel6 = outseloutput[35:30];
+        b01 : inputledsel6 = players.mem_trail6;
+        default: //necessary to init
+            inputledsel6 = 0; 
+    }
+    
+    //colour mux  
+    case(game_controlunit.colsel){ 
+        b00 : colseloutput = players.cmsel;
+        b01 : colseloutput = b00;
+        b10 : colseloutput = b01;
+        b11 : colseloutput = b10;
+        default: //necessary to init
+            colseloutput = 00; 
+    }
+    
+    
+    
+    
+    
+    
+    //for debugging
+  //  debug_out[3:0] = players.all_buttons;
+  //  debug_out[7:4] = players.out;    
+  //  debug_out = game_controlunit.debug;
+    
+    //debug_out = players.timer;
+ //   debug_out = vc.debug;
+    //p1_out = players.all_scores[15:0];
+    //p2_out = players.all_scores[31:16];
+    //debug_slowclock = slow_timer.value;
+    //debug_vcclock = vc.out;
+ 
+  }
+}

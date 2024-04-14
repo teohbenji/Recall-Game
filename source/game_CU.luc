@@ -1,0 +1,72 @@
+module game_CU (
+    input clk,
+    input rst,
+    /*
+    input up_button,
+    input down_button,
+    input right_button,
+    input left_button,
+    input start_button,
+    input reset_button,
+    */
+    //input decrease_timer
+    
+    
+    input regfile_datain[16], //direct reading of regfile data from read_address_b
+    
+    output alufn[6], // ALUFN: -
+    output asel[4], //ASEL: -
+    output bsel[4],//BSEL: -
+    output we_regfile[1],//WE: b1
+    output regfile_read_address_a[4], //Ra: -
+    output regfile_read_address_b[4], //Rb: -
+    output regfile_write_address[4],//Rc: 0xD
+    output wdsel[2], //WDSEL: b01
+    output romsel[3], //ROMSEL: b000
+    output outsel[2], //OUTSEL: b00
+    output ledsel[2], //LEDSEL: b00
+    output colsel[2]
+  ) {
+  
+  .clk(clk){
+    fsm game_fsm={
+      START_STATE};
+  }
+
+  always {
+    // standard setting unless otherwise overwritten by each case 
+    alufn = 0;
+    asel = 0; 
+    bsel = 0;
+    we_regfile = 0;
+    regfile_write_address = 1111;
+    regfile_read_address_a = 0000;
+    regfile_read_address_b = 0000;
+    wdsel = 0;
+    romsel = 0;
+    outsel = 0;
+    ledsel = 0;
+    colsel = 0;
+    
+    if (rst) {
+      //do something
+    } else {
+      case(game_fsm.q){        
+        game_fsm.START_STATE:
+        //alufn = ;
+        //asel = ; 
+        //bsel = ;
+        we_regfile = b0;
+        //regfile_write_address = ;
+        //regfile_read_address_a = ;
+        //regfile_read_address_b = ;
+        //wdsel = ;
+        romsel = b101; //TODO: CHANGE BACK TO b100 afte testing
+        outsel = b01;
+        ledsel = b00;
+        colsel = b10;
+        game_fsm.d = game_fsm.START_STATE;}
+      }
+    }
+  }
+
