@@ -49,19 +49,16 @@ module game_miniBeta (
   game_CU game_controlunit(.clk(clk),.rst(rst));
   game_miniRegfiles players(.clk(clk),.rst(rst));
   
-  /*
+  
  .clk(clk){
-    //edge_detector game_timer_detector(#RISE(1), #FALL(0));
+    edge_detector game_timer_detector(#RISE(1), #FALL(0));
+    edge_detector map_timer_detector(#RISE(1), #FALL(0));
     
-    .rst(rst){
-      game_CU game_controlunit;
-      game_miniRegfiles players;
-      
-      //counter slow_timer(#SIZE(1),#DIV(26)); 
-
+    .rst(rst){    
+      counter slow_timer(#SIZE(1),#DIV(26)); 
     }
   }
-  */
+  
   always {
     rand.seed=16hABCD;
     rand.next=1;
@@ -71,11 +68,13 @@ module game_miniBeta (
     //timer = players.timer;
     
     //edge detectors
-    //game_timer_detector.in = slow_timer.value; // 30 second timer detector
+    game_timer_detector.in = slow_timer.value; // 30 second timer detector
+    map_timer_detector.in = slow_timer.value; // 30 second timer detector
     
     //pass timer and counter signals to CU unit 
     // detects slow clock rise and 
-    //game_controlunit.decrease_timer = game_timer_detector.out;
+    game_controlunit.decrease_timer_gameplay = game_timer_detector.out;
+    game_controlunit.decrease_timer_mapdisplay = map_timer_detector.out;
     
     //pass buttons press signal to CU unit    
     game_controlunit.up_button = up_button;
