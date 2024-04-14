@@ -57,7 +57,12 @@ module game_CU (
       MAP_A_DISPLAY,
       MAP_B_DISPLAY,
       MAP_C_DISPLAY,
-      CORRECT_COLOR_DISPLAY
+      CORRECT_COLOR_DISPLAY,
+      DISPLAY_MEMORY_TRAILS,
+      
+      SET_TIMER_90S
+           
+      
       
       };
   }
@@ -403,10 +408,42 @@ module game_CU (
             
             //TODO: Change to timer eventually
              if (start_button){
-              game_fsm.d = game_fsm.MAP_A_DISPLAY; //loop back for fun, test again later
+              game_fsm.d = game_fsm.DISPLAY_MEMORY_TRAILS; //loop back for fun, test again later
             } else {
                game_fsm.d = game_fsm.CORRECT_COLOR_DISPLAY;
             }
+          
+          game_fsm.DISPLAY_MEMORY_TRAILS: 
+            //alufn = CMPEQ;
+            //asel = b0000; 
+            //bsel = b0001 ;
+            we_regfile = b0;
+            //regfile_write_address = b1100;
+            //regfile_read_address_a = b0101;
+            //regfile_read_address_b = ;
+            //wdsel = b00;
+            //romsel = b100;
+            //outsel = b01;
+            ledsel = b01;
+            
+            game_fsm.d = game_fsm.SET_TIMER_90S;
+          
+        
+         game_fsm.SET_TIMER_90S: 
+            alufn = b011010; //ADD
+            asel = b1000; 
+            //bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b0101;
+            //regfile_read_address_a = b0101;
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b100;
+            //outsel = b01;
+            //ledsel = b01;
+            
+            //TODO: CHANGE TO IDLE
+            game_fsm.d = game_fsm.SET_TIMER_90S; 
           
         }
       }
