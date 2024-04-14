@@ -28,6 +28,25 @@ module game_CU (
   
   .clk(clk){
     fsm game_fsm={
+      START_NEW_GAME,
+      
+      RESET_SCORE_TO_0,
+      
+      //RESET ROUND
+      RESET_TIMER_0,
+      RESET_X_COORD,  
+      RESET_Y_COORD, 
+      RESET_SELECT_MAPS,  
+      RESET_CORRECT_MAP, 
+      RESET_MEM_TRAIL_1,
+      RESET_MEM_TRAIL_2,
+      RESET_MEM_TRAIL_3,
+      RESET_MEM_TRAIL_4,
+      RESET_MEM_TRAIL_5,
+      RESET_MEM_TRAIL_6,
+      
+      
+      
       START_STATE,
       
       //Randomiser
@@ -61,7 +80,201 @@ module game_CU (
     if (rst) {
       //do something
     } else {
-      case(game_fsm.q){        
+      case(game_fsm.q){
+        game_fsm.START_NEW_GAME: 
+          if (start_button){
+              game_fsm.d = game_fsm.RESET_SCORE_TO_0;
+          }
+               
+          else {        
+              game_fsm.d = game_fsm.START_NEW_GAME;
+          }
+          
+        game_fsm.RESET_SCORE_TO_0: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0000;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_TIMER_0;  
+          
+        game_fsm.RESET_TIMER_0: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0101;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_X_COORD;
+          
+        game_fsm.RESET_X_COORD: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0001;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;  
+          
+          game_fsm.d = game_fsm.RESET_Y_COORD;  
+            
+        game_fsm.RESET_Y_COORD: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0010;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_SELECT_MAPS;
+            
+        game_fsm.RESET_SELECT_MAPS: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0011;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_CORRECT_MAP;  
+        
+        game_fsm.RESET_CORRECT_MAP: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0100;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_1;
+            
+       game_fsm.RESET_MEM_TRAIL_1: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0010 ;
+          we_regfile = b1;
+          regfile_write_address = b0110;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_2;
+            
+       game_fsm.RESET_MEM_TRAIL_2: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0111;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_3;
+            
+       game_fsm.RESET_MEM_TRAIL_3: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b1000;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_4;     
+            
+       game_fsm.RESET_MEM_TRAIL_4: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b1001;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_5;     
+            
+        game_fsm.RESET_MEM_TRAIL_5: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b1010;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RESET_MEM_TRAIL_6; 
+                
+        game_fsm.RESET_MEM_TRAIL_6: 
+          alufn = b011100; //"B"
+          //asel = ; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b1011;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          //TODO: how to know to skip this, 
+          //create another state?
+          game_fsm.d = game_fsm.START_STATE;
+          
+        
+
+            
         game_fsm.START_STATE:
           //alufn = ;
           //asel = ; 
