@@ -7,7 +7,7 @@ module au_top (
     output io_led [3][8],   // LEDs on IO Shield
     output io_seg [8],      // 7-segment LEDs on IO Shield (ANODE)
     output io_sel [4],      // Digit select on IO Shield
-    input io_button [5],    // 5 buttons on IO Shield
+    input io_button [6],    // 5 buttons on IO Shield
     input io_dip [3][8],     // DIP switches on IO Shield
     
     //LED strips
@@ -20,7 +20,6 @@ module au_top (
   ) {
   
   sig rst;                  // reset signal
-  //alu alu;
   ws2812b ws2812b;
 
   .clk(clk) {
@@ -32,6 +31,21 @@ module au_top (
       
     }
     reset_conditioner reset_cond;
+    
+    //user input button declarations
+    edge_detector edge_dt_btn_up (#RISE(1), #FALL(0));
+    edge_detector edge_dt_btn_down(#RISE(1), #FALL(0));
+    edge_detector edge_dt_btn_left (#RISE(1), #FALL(0));
+    edge_detector edge_dt_btn_right(#RISE(1), #FALL(0));
+    edge_detector edge_dt_btn_start (#RISE(1), #FALL(0));
+    edge_detector edge_dt_btn_reset(#RISE(1), #FALL(0));
+
+    button_conditioner btn_cond_up;
+    button_conditioner btn_cond_down;
+    button_conditioner btn_cond_left;
+    button_conditioner btn_cond_right;
+    button_conditioner btn_cond_start;
+    button_conditioner btn_cond_reset;
   } 
   
   always {
@@ -48,7 +62,38 @@ module au_top (
     
     usb_tx = usb_rx;          // loop serial port
     
-    //LED strips 
+    //Initialise buttons
+    // Reduce bouncing effect of button
+    /*
+    pin io_button[0] B28 pulldown;
+    pin io_button[1] B27 pulldown;
+    pin io_button[2] B23 pulldown;
+    pin io_button[3] B24 pulldown;
+    pin io_button[4] C49 pulldown;
+    pin io_button[5] C48 pulldown;
+    */
+    btn_cond_up.in=io_button[5];    //C48
+    btn_cond_down.in=io_button[4];  //C49
+    btn_cond_left.in=io_button[3];  //B24
+    btn_cond_right.in=io_button[2]; //B23
+    btn_cond_start.in=io_button[1]; //B27 
+    btn_cond_reset.in=io_button[0]; //B28
+    
+    edge_dt_btn_up.in=btn_cond_up.out; //get the edge of button press
+    edge_dt_btn_down.in=btn_cond_down.out;
+    edge_dt_btn_left.in=btn_cond_left.out; //get the edge of button press
+    edge_dt_btn_right.in=btn_cond_right.out;
+    edge_dt_btn_start.in=btn_cond_start.out; //get the edge of button press
+    edge_dt_btn_reset.in=btn_cond_reset.out;
+    
+    gameMachine.up_button = edge_dt_btn_up.out;
+    gameMachine.down_button = edge_dt_btn_down.out;
+    gameMachine.left_button = edge_dt_btn_left.out;
+    gameMachine.right_button = edge_dt_btn_right.out;
+    gameMachine.start_button = edge_dt_btn_start.out;
+    gameMachine.reset_button = edge_dt_btn_reset.out;
+    
+    //Initialise LED strips 
     ws2812b.clk = clk;
     ws2812b.rst_n = rst_n;
     ws2812b.usb_rx = usb_rx;

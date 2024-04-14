@@ -1,14 +1,12 @@
 module game_CU (
     input clk,
     input rst,
-    /*
     input up_button,
     input down_button,
     input right_button,
     input left_button,
     input start_button,
     input reset_button,
-    */
     //input decrease_timer
     
     
@@ -30,7 +28,16 @@ module game_CU (
   
   .clk(clk){
     fsm game_fsm={
-      START_STATE};
+      START_STATE,
+      
+      //Random states
+      RANDOM_CHOOSE_MAP,
+      RANDOM_SET_MAP,
+      
+      //Display map states
+      MAP_A_DISPLAY
+      
+      };
   }
 
   always {
@@ -53,19 +60,71 @@ module game_CU (
     } else {
       case(game_fsm.q){        
         game_fsm.START_STATE:
-        //alufn = ;
-        //asel = ; 
-        //bsel = ;
-        we_regfile = b0;
-        //regfile_write_address = ;
-        //regfile_read_address_a = ;
-        //regfile_read_address_b = ;
-        //wdsel = ;
-        romsel = b101; //TODO: CHANGE BACK TO b100 afte testing
-        outsel = b01;
-        ledsel = b00;
-        colsel = b10;
-        game_fsm.d = game_fsm.START_STATE;}
+          //alufn = ;
+          //asel = ; 
+          //bsel = ;
+          we_regfile = b0;
+          //regfile_write_address = ;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          //wdsel = ;
+          romsel = b100; 
+          outsel = b01;
+          ledsel = b00;
+          colsel = b10;
+          if (start_button){
+            game_fsm.d = game_fsm.RANDOM_CHOOSE_MAP;
+          } else {
+             game_fsm.d = game_fsm.START_STATE;
+          }
+          
+        game_fsm.RANDOM_CHOOSE_MAP: 
+          alufn = b011010; //"A"
+          asel = b0001; 
+          //bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0100;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.RANDOM_SET_MAP;
+          
+         game_fsm.RANDOM_SET_MAP: 
+            alufn = b011010; //"A"
+            asel = b0010; 
+            //bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b0011;
+            //regfile_read_address_a = ;
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b100;
+            //outsel = b01;
+            //ledsel = b00;
+            
+            game_fsm.d = game_fsm.MAP_A_DISPLAY;
+          
+         game_fsm.MAP_A_DISPLAY: 
+            //alufn = A;
+            //asel = b0010; 
+            //bsel = b0001 ;
+            we_regfile = b0;
+            //regfile_write_address = b0011;
+            //regfile_read_address_a = ;
+            //regfile_read_address_b = ;
+            //wdsel = b00;
+            romsel = b001;
+            outsel = b01;
+            ledsel = b00;
+            colsel = b01;
+            
+            game_fsm.d = game_fsm.MAP_A_DISPLAY;
+          
+        }
       }
     }
   }
