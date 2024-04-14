@@ -64,14 +64,6 @@ module au_top (
     
     //Initialise buttons
     // Reduce bouncing effect of button
-    /*
-    pin io_button[0] B28 pulldown;
-    pin io_button[1] B27 pulldown;
-    pin io_button[2] B23 pulldown;
-    pin io_button[3] B24 pulldown;
-    pin io_button[4] C49 pulldown;
-    pin io_button[5] C48 pulldown;
-    */
     btn_cond_up.in=io_button[5];    //C48
     btn_cond_down.in=io_button[4];  //C49
     btn_cond_left.in=io_button[3];  //B24

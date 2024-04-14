@@ -30,12 +30,14 @@ module game_CU (
     fsm game_fsm={
       START_STATE,
       
-      //Random states
+      //Randomiser
       RANDOM_CHOOSE_MAP,
       RANDOM_SET_MAP,
       
-      //Display map states
-      MAP_A_DISPLAY
+      //Display all maps 
+      MAP_A_DISPLAY,
+      MAP_B_DISPLAY,
+      MAP_C_DISPLAY
       
       };
   }
@@ -122,8 +124,54 @@ module game_CU (
             ledsel = b00;
             colsel = b01;
             
-            game_fsm.d = game_fsm.MAP_A_DISPLAY;
+            //TODO: Change to timer eventually
+             if (start_button){
+              game_fsm.d = game_fsm.MAP_B_DISPLAY;
+            } else {
+               game_fsm.d = game_fsm.MAP_A_DISPLAY;
+            }
+
+          game_fsm.MAP_B_DISPLAY: 
+            //alufn = A;
+            //asel = b0010; 
+            //bsel = b0001 ;
+            we_regfile = b0;
+            //regfile_write_address = b0011;
+            //regfile_read_address_a = ;
+            //regfile_read_address_b = ;
+            //wdsel = b00;
+            romsel = b010;
+            outsel = b01;
+            ledsel = b00;
+            colsel = b10;
+            
+            //TODO: Change to timer eventually
+             if (start_button){
+              game_fsm.d = game_fsm.MAP_C_DISPLAY;
+            } else {
+               game_fsm.d = game_fsm.MAP_B_DISPLAY;
+            }
           
+          game_fsm.MAP_C_DISPLAY: 
+            //alufn = A;
+            //asel = b0010; 
+            //bsel = b0001 ;
+            we_regfile = b0;
+            //regfile_write_address = b0011;
+            //regfile_read_address_a = ;
+            //regfile_read_address_b = ;
+            //wdsel = b00;
+            romsel = b011;
+            outsel = b01;
+            ledsel = b00;
+            colsel = b11;
+            
+            //TODO: Change to timer eventually
+             if (start_button){
+              game_fsm.d = game_fsm.MAP_A_DISPLAY; //loop back for fun, test again later
+            } else {
+               game_fsm.d = game_fsm.MAP_C_DISPLAY;
+            }
         }
       }
     }
