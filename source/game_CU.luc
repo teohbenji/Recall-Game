@@ -68,11 +68,37 @@ module game_CU (
       A_BRANCH_TIMER_0,
       A_DECREASE_TIMER_1,
       
+      //Set map B display time
+      B_CHECK_SCORE_0,
+      B_CHECK_SCORE_0_BRANCH,
+      B_SET_TIMER_0_S10,
+      B_CHECK_SCORE_1,
+      B_CHECK_SCORE_1_BRANCH,
+      B_SET_TIMER_1_S7,
+      B_SET_TIMER_2_S5,
+      
       //Display map B
-      MAP_B_DISPLAY, 
+      MAP_B_DISPLAY,
+      B_CHECK_TIMER_0,
+      B_BRANCH_TIMER_0,
+      B_DECREASE_TIMER_1,
+      
+      //Set map C display time
+      C_CHECK_SCORE_0,
+      C_CHECK_SCORE_0_BRANCH,
+      C_SET_TIMER_0_S10,
+      C_CHECK_SCORE_1,
+      C_CHECK_SCORE_1_BRANCH,
+      C_SET_TIMER_1_S7,
+      C_SET_TIMER_2_S5,
       
       //Display map C   
       MAP_C_DISPLAY,
+      C_CHECK_TIMER_0,
+      C_BRANCH_TIMER_0,
+      C_DECREASE_TIMER_1,
+      
+      //Display after 3 maps
       CORRECT_COLOR_DISPLAY,
       DISPLAY_MEMORY_TRAILS,
       
@@ -351,7 +377,7 @@ module game_CU (
             bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b1111; // temp reg 15
-            regfile_read_address_a = b0101;
+            regfile_read_address_a = b0000;
             //regfile_read_address_b = ;
             wdsel = b00;
             //romsel = b001;
@@ -400,10 +426,10 @@ module game_CU (
         game_fsm.A_CHECK_SCORE_1: 
             alufn = b110011; // CMPEQ
             asel = b0000; 
-            bsel = b0001 ;
+            bsel = b0010 ;
             we_regfile = b1;
             regfile_write_address = b1111; // temp reg 15
-            regfile_read_address_a = b0101;
+            regfile_read_address_a = b0000;
             //regfile_read_address_b = ;
             wdsel = b00;
             //romsel = b001;
@@ -515,8 +541,7 @@ module game_CU (
             //seven_seg_2 = b00;
             
             if (regfile_datain[0]){                      //direct read in
-              //TODO: game_fsm.d = game_fsm.B_CHECK_SCORE_0;
-              game_fsm.d = game_fsm.MAP_B_DISPLAY;
+              game_fsm.d = game_fsm.B_CHECK_SCORE_0;
             }
             else{
               game_fsm.d = game_fsm.A_DECREASE_TIMER_1;
@@ -537,27 +562,207 @@ module game_CU (
             //ledsel = b00;
             
             game_fsm.d = game_fsm.MAP_A_DISPLAY;
-
-          game_fsm.MAP_B_DISPLAY: 
-            //alufn = A;
-            //asel = b0010; 
-            //bsel = b0001 ;
-            we_regfile = b0;
-            //regfile_write_address = b0011;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
-            //wdsel = b00;
-            romsel = b010;
-            outsel = b01;
-            ledsel = b00;
-            colsel = b10;
+          
+        game_fsm.B_CHECK_SCORE_0: 
+          alufn = b110011; // CMPEQ
+          asel = b0000; 
+          bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b1111; // temp reg 15
+          regfile_read_address_a = b0000;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b001;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.B_CHECK_SCORE_0_BRANCH;  
+          
+      game_fsm.B_CHECK_SCORE_0_BRANCH: 
+          //alufn = CMPEQ;
+          //asel = b0000; 
+          //bsel = b0001 ;
+          //we_regfile = b1;
+          //regfile_write_address = b1100;
+          //regfile_read_address_a = b0101;
+          regfile_read_address_b = b1111; // temp reg 15
+          //wdsel = b00;
+          //romsel = b001;
+          //outsel = b01;
+          //ledsel = b00;
+          //seven_seg_1 = b00;
+          //seven_seg_2 = b00;
+          
+          if (regfile_datain[0]){                      //direct read in
+            game_fsm.d = game_fsm.B_SET_TIMER_0_S10;
+          }
+          else{
+            game_fsm.d = game_fsm.B_CHECK_SCORE_1;
+          }   
             
-            //TODO: Change to timer eventually
-             if (start_button){
+      game_fsm.B_SET_TIMER_0_S10: 
+          alufn = b011010; //"A"
+          asel = b0111; 
+          //bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0101;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          //TODO: CHANGE BACK TO MAP B!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          game_fsm.d = game_fsm.MAP_B_DISPLAY;   
+            
+      game_fsm.B_CHECK_SCORE_1: 
+          alufn = b110011; // CMPEQ
+          asel = b0000; 
+          bsel = b0010 ;
+          we_regfile = b1;
+          regfile_write_address = b1111; // temp reg 15
+          regfile_read_address_a = b0000;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b001;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.B_CHECK_SCORE_1_BRANCH;  
+            
+      game_fsm.B_CHECK_SCORE_1_BRANCH: 
+          //alufn = CMPEQ;
+          //asel = b0000; 
+          //bsel = b0001 ;
+          //we_regfile = b1;
+          //regfile_write_address = b1100;
+          //regfile_read_address_a = b0101;
+          regfile_read_address_b = b1111; // temp reg 15
+          //wdsel = b00;
+          //romsel = b001;
+          //outsel = b01;
+          //ledsel = b00;
+          //seven_seg_1 = b00;
+          //seven_seg_2 = b00;
+          
+          if (regfile_datain[0]){                      //direct read in
+            game_fsm.d = game_fsm.B_SET_TIMER_1_S7;
+          }
+          else{
+            game_fsm.d = game_fsm.B_SET_TIMER_2_S5;}   
+              
+       game_fsm.B_SET_TIMER_1_S7:
+          alufn = b011010; //"A"
+          asel = b0110; 
+          //bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0101;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          game_fsm.d = game_fsm.MAP_B_DISPLAY;   
+            
+            
+       game_fsm.B_SET_TIMER_2_S5:
+          alufn = b011010; //"A"
+          asel = b0101; 
+          //bsel = b0001 ;
+          we_regfile = b1;
+          regfile_write_address = b0101;
+          //regfile_read_address_a = ;
+          //regfile_read_address_b = ;
+          wdsel = b00;
+          //romsel = b100;
+          //outsel = b01;
+          //ledsel = b00;
+          
+          //TODO: CHANGE TO MAP B DISPLAY
+          game_fsm.d = game_fsm.MAP_B_DISPLAY;
+            
+          
+        game_fsm.MAP_B_DISPLAY: 
+        //alufn = A;
+        //asel = b0010; 
+        //bsel = b0001 ;
+        we_regfile = b0;
+        //regfile_write_address = b0011;
+        //regfile_read_address_a = ;
+        //regfile_read_address_b = ;
+        //wdsel = b00;
+        romsel = b010;//
+        outsel = b01;
+        ledsel = b00;
+        colsel = b10;
+          if (decrease_timer_mapdisplay){
+            game_fsm.d = game_fsm.B_CHECK_TIMER_0;
+          }
+          else {
+            game_fsm.d = game_fsm.MAP_B_DISPLAY;}
+
+          
+          
+         game_fsm.B_CHECK_TIMER_0: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b1111; // temp reg 15
+            regfile_read_address_a = b0101;
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+            
+            game_fsm.d = game_fsm.B_BRANCH_TIMER_0;
+              
+              
+              
+         game_fsm.B_BRANCH_TIMER_0: 
+            //alufn = CMPEQ;
+            //asel = b0000; 
+            //bsel = b0001 ;
+            //we_regfile = b1;
+            //regfile_write_address = b1100;
+            //regfile_read_address_a = b0101;
+            regfile_read_address_b = b1111; // temp reg 15
+            //wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+            //seven_seg_1 = b00;
+            //seven_seg_2 = b00;
+            
+            if (regfile_datain[0]){                      //direct read in
+              //TODO: CHANGE TO C BRANCH SMTH LATER
               game_fsm.d = game_fsm.MAP_C_DISPLAY;
-            } else {
-               game_fsm.d = game_fsm.MAP_B_DISPLAY;
             }
+            else{
+              game_fsm.d = game_fsm.B_DECREASE_TIMER_1;
+            }
+              
+              
+        game_fsm.B_DECREASE_TIMER_1: 
+            alufn = b000001;  //SUB
+            asel = b0000; 
+            bsel = b0010 ;
+            we_regfile = b1;
+            regfile_write_address = b0101;
+            regfile_read_address_a = b0101;
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+            
+            game_fsm.d = game_fsm.MAP_B_DISPLAY;
+              
+          
           
           game_fsm.MAP_C_DISPLAY: 
             //alufn = A;
