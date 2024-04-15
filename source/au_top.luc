@@ -19,6 +19,7 @@ module au_top (
   ) {
   
   sig rst;                  // reset signal
+
   ws2812b ws2812b;
 
   .clk(clk) {

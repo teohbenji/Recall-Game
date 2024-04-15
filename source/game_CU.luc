@@ -28,6 +28,7 @@ module game_CU (
   
   .clk(clk){
     fsm game_fsm={
+      TEST_TRAIL, //FIRST STATE, DELETE LATER
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -121,9 +122,22 @@ module game_CU (
       LEFT_CHECKER,
       RIGHT_CHECKER,
       
+      //MOVEMENT checks and coord updates
+      UP_INCREASEBY1,
+      RIGHT_INCREASEBY1,
+      
+      //MEMORY TRAILS
+      CONVERT_X_6BIT,
+      CHECK_Y_0,
+      CHECK_Y_0_BRANCH,
+      Y0_UPDATE_DISPLAY_MEMTRAIL,
+      Y1_UPDATE_DISPLAY_MEMTRAIL,
+      
       
       //End of round displays
       DISPLAY_SAD_FACE    
+      
+      
       
       
       };
@@ -1087,7 +1101,7 @@ module game_CU (
           
         
          game_fsm.SET_TIMER_90S: 
-            alufn = b011010; //ADD
+            alufn = b011010; //A
             asel = b1000; 
             //bsel = b0001 ;
             we_regfile = b1;
@@ -1104,60 +1118,60 @@ module game_CU (
           
           game_fsm.IDLE: 
           
+            ledsel = b01;
           //Check time first, more important
             /*
             if (decrease_timer_gameplay){
                 game_fsm.d = game_fsm.CHECK_GAME_TIMER;
             }
             
+            
+        */
+         
             //movement checker
-            else if (up_button){
-              game_fsm.d = game_fsm.UP_CHECKER;
+            if (up_button){ //change to else if 
+              //game_fsm.d = game_fsm.UP_CHECKER;
+              game_fsm.d = game_fsm.TEST_TRAIL;
+            } 
+        
+            else if (right_button){
+                //game_fsm.d = game_fsm.RIGHT_CHECKER;
+              //game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
+              game_fsm.d = game_fsm.TEST_TRAIL;
             }
+        
+            /*
             else if (down_button){
                 game_fsm.d = game_fsm.DOWN_CHECKER;
             }
             else if (left_button){
                 game_fsm.d = game_fsm.LEFT_CHECKER;
             }
-            else if (right_button){
-                game_fsm.d = game_fsm.RIGHT_CHECKER;
-            }*/
+            */
+
             if (reset_button){ //change back to else if, change back to start button
                 game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
             }          
             else{
-                game_fsm.d = game_fsm.IDLE; }
-             
-            
-          /* 
-          game_fsm.CHECK_GAME_TIMER:
-              alufn = b110011;                         //CMPEQ
-              regfile_read_address_a = b1100;          //timer reg
-              asel = b00;
-              bsel = b10;                              //constant 0
-              we_regfile = 1;
-              regfile_write_address = b1111;                 //temp eg 
-              game_fsm.d = game_fsm.BRANCH_GAME_TIMER;
+                game_fsm.d = game_fsm.IDLE; 
+            }
           
-           game_fsm.BRANCH_GAME_TIMER:
-              regfile_read_address_b = b1111;          //temp reg
-              if (regfile_datain[0]){                 //if timer is not zero
-                game_fsm.d = game_fsm.DECREASE_GAME_TIMER;
-                }
-              else{
-                game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
-                }
           
-           game_fsm.DECREASE_GAME_TIMER:
-              alufn = b000001;                         //SUB
-              regfile_read_address_a = b1100;          //timer reg
-              asel = b00; 
-              bsel = b01;                              //constant 1
-              we_regfile = 1;
-              regfile_write_address = b1100;
-              game_fsm.d = game_fsm.IDLE;*/
-
+          game_fsm.TEST_TRAIL:
+            alufn = b011010; //"A"
+            asel = b0110; //display 000111
+            //bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b0110; //update y0
+            //regfile_read_address_a = ;
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b100;
+            //outsel = b01;
+            ledsel = b01;
+            game_fsm.d = game_fsm.TEST_TRAIL;
+          
+          
            game_fsm.DISPLAY_SAD_FACE: 
               //alufn = A;
               //asel = b0010; 
@@ -1173,6 +1187,128 @@ module game_CU (
               colsel = b01;
               
               game_fsm.d = game_fsm.START_NEW_GAME;
+          
+          game_fsm.UP_INCREASEBY1: 
+            alufn = b000001; //ADD
+            asel = b0000; 
+            bsel = b0010 ; // 1
+            we_regfile = b1;
+            regfile_write_address = b0010; //ycoord
+            regfile_read_address_a = b0010; //ycoord
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b01;
+    
+            //game_fsm.d = game_fsm.PULL_BIT_ROM;
+            game_fsm.d = game_fsm.CONVERT_X_6BIT;
+          
+          game_fsm.RIGHT_INCREASEBY1:
+            alufn = b000001; //ADD
+            asel = b0000; 
+            bsel = b0010 ; // 1
+            we_regfile = b1;
+            regfile_write_address = b0001; //xcoord
+            regfile_read_address_a = b0001; //xcoord
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b01;
+    
+            //game_fsm.d = game_fsm.PULL_BIT_ROM;
+            game_fsm.d = game_fsm.CONVERT_X_6BIT;
+          
+          game_fsm.CONVERT_X_6BIT: 
+            //shifting 12b0...1 by x
+            //SHL is shift A by B bits
+            alufn = b100000; //SHL
+            asel = b0011; //12b0..1
+            bsel = b0000;
+            we_regfile = b1;
+            regfile_write_address = b1101; //store new position for memtrail in temp reg 13
+            //regfile_read_address_a = b0011; 
+            regfile_read_address_b = b0001 ; //x
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+    
+            
+            game_fsm.d = game_fsm.CHECK_Y_0;
+          
+           game_fsm.CHECK_Y_0: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0001;
+            we_regfile = b1;
+            regfile_write_address = b1111; // temp reg 15
+            regfile_read_address_a = b0010 ;
+            //regfile_read_address_b = b1100 ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+    
+            
+            game_fsm.d = game_fsm.CHECK_Y_0_BRANCH;
+              
+          
+          game_fsm.CHECK_Y_0_BRANCH: 
+              //alufn = CMPEQ;
+              //asel = b0000; 
+              //bsel = b0001 ;
+              //we_regfile = b1;
+              //regfile_write_address = b1100;
+              //regfile_read_address_a = b0101;
+              regfile_read_address_b = b1111; // temp reg 15
+              //wdsel = b00;
+              //romsel = b001;
+              //outsel = b01;
+              //ledsel = b00;
+              //seven_seg_1 = b00;
+              //seven_seg_2 = b00;
+              
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+              }
+              else{
+                //game_fsm.d = game_fsm.CHECK_Y_1; //go memeory trail
+                game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
+            }           
+          
+          game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b0110; 
+              regfile_read_address_a = b0110; //current 1st row
+              regfile_read_address_b = b1101; //temp reg 13
+              wdsel = b00;
+              //romsel = b001;
+              //outsel = b01;
+              ledsel = b01;
+      
+              //game_fsm.d = game_fsm.IDLE; 
+              game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+          
+          game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b0111;
+              regfile_read_address_a = b0111; //current 2nd row
+              regfile_read_address_b = b1101; //temp reg 13
+              wdsel = b00;
+              //romsel = b001;
+              //outsel = b01;
+              ledsel = b01;
+      
+              //game_fsm.d = game_fsm.IDLE;
+              game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;  
           
         }
       }
