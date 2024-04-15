@@ -5,7 +5,7 @@ pin outled_4 C37;
 pin outled_5 C40;
 pin outled_6 C43;
 
-pin io_button[0] C3 pulldown; //reset
+pin io_button[0] B28 pulldown; //reset
 pin io_button[1] B27 pulldown; //start
 pin io_button[2] B23 pulldown; //right
 pin io_button[3] B24 pulldown; //left
