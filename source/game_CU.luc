@@ -28,7 +28,6 @@ module game_CU (
   
   .clk(clk){
     fsm game_fsm={
-      TEST_TRAIL, //FIRST STATE, DELETE LATER
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -111,12 +110,13 @@ module game_CU (
       SET_TIMER_90S,
       
       //Idle state timer
-      IDLE,
+      //IDLE, TODO: UNCOMMENT LATER
       CHECK_GAME_TIMER,
       BRANCH_GAME_TIMER,
       DECREASE_GAME_TIMER,
       
       //Idle state movement checker
+      IDLE,
       UP_CHECKER,
       DOWN_CHECKER,
       LEFT_CHECKER,
@@ -132,7 +132,7 @@ module game_CU (
       CHECK_Y_0_BRANCH,
       Y0_UPDATE_DISPLAY_MEMTRAIL,
       Y1_UPDATE_DISPLAY_MEMTRAIL,
-      
+      TEST_TRAIL,
       
       //End of round displays
       DISPLAY_SAD_FACE    
@@ -263,9 +263,9 @@ module game_CU (
           game_fsm.d = game_fsm.RESET_MEM_TRAIL_1;
             
        game_fsm.RESET_MEM_TRAIL_1: 
-          alufn = b011100; //"B"
-          //asel = ; 
-          bsel = b0010 ;
+          alufn = b011010; //"A"
+          asel = b1001; 
+          //bsel = b0010 ;
           we_regfile = b1;
           regfile_write_address = b0110;
           //regfile_read_address_a = ;
@@ -1131,13 +1131,13 @@ module game_CU (
             //movement checker
             if (up_button){ //change to else if 
               //game_fsm.d = game_fsm.UP_CHECKER;
-              game_fsm.d = game_fsm.TEST_TRAIL;
+              game_fsm.d = game_fsm.UP_INCREASEBY1;
             } 
         
             else if (right_button){
                 //game_fsm.d = game_fsm.RIGHT_CHECKER;
               //game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
-              game_fsm.d = game_fsm.TEST_TRAIL;
+              game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
             }
         
             /*
@@ -1148,29 +1148,32 @@ module game_CU (
                 game_fsm.d = game_fsm.LEFT_CHECKER;
             }
             */
+            
 
-            if (reset_button){ //change back to else if, change back to start button
-                game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
-            }          
+            else if (reset_button){ //change back to else if, change back to start button
+                game_fsm.d = game_fsm.DISPLAY_SAD_FACE; //TODO: CHANGE BACK
+                
+            } else if (start_button){ //delete when done testing
+                game_fsm.d = game_fsm.TEST_TRAIL;
+            }         
             else{
                 game_fsm.d = game_fsm.IDLE; 
             }
-          
-          
-          game_fsm.TEST_TRAIL:
+           
+           game_fsm.TEST_TRAIL:
             alufn = b011010; //"A"
             asel = b0110; //display 000111
-            //bsel = b0001 ;
+           //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0110; //update y0
-            //regfile_read_address_a = ;
+           //regfile_read_address_a = ;
             //regfile_read_address_b = ;
             wdsel = b00;
             //romsel = b100;
             //outsel = b01;
             ledsel = b01;
-            game_fsm.d = game_fsm.TEST_TRAIL;
-          
+            game_fsm.d = game_fsm.IDLE;
+           
           
            game_fsm.DISPLAY_SAD_FACE: 
               //alufn = A;
@@ -1221,10 +1224,10 @@ module game_CU (
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           game_fsm.CONVERT_X_6BIT: 
-            //shifting 12b0...1 by x
+            //shifting right 6b10..0 by x
             //SHL is shift A by B bits
-            alufn = b100000; //SHL
-            asel = b0011; //12b0..1
+            alufn = b100001; //SHR
+            asel = b1001; //6b10..0
             bsel = b0000;
             we_regfile = b1;
             regfile_write_address = b1101; //store new position for memtrail in temp reg 13
@@ -1291,8 +1294,8 @@ module game_CU (
               //outsel = b01;
               ledsel = b01;
       
-              //game_fsm.d = game_fsm.IDLE; 
-              game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+              game_fsm.d = game_fsm.IDLE; 
+              //game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
           
           game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR;
@@ -1307,8 +1310,8 @@ module game_CU (
               //outsel = b01;
               ledsel = b01;
       
-              //game_fsm.d = game_fsm.IDLE;
-              game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;  
+              game_fsm.d = game_fsm.IDLE;
+              //game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;  
           
         }
       }

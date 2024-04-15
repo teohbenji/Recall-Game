@@ -108,8 +108,8 @@ module game_miniBeta (
       b0101 : inputAlu_a = b0101;
       b0110 : inputAlu_a = b0111;
       b0111 : inputAlu_a = b1010;
-      b1000 : inputAlu_a = b00111100;
-      b1001 : inputAlu_a = 0;
+      b1000 : inputAlu_a = b00111100; //0x3C for 60s timer(?)
+      b1001 : inputAlu_a = 6b100000;
       default : //b10 unused
           inputAlu_a = players.out_a;
     }
