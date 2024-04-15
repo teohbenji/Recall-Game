@@ -8,7 +8,6 @@ module au_top (
     output io_seg [8],      // 7-segment LEDs on IO Shield (ANODE)
     output io_sel [4],      // Digit select on IO Shield
     input io_button [6],    // 5 buttons on IO Shield
-    input io_dip [3][8],     // DIP switches on IO Shield
     
     //LED strips
     output outled_1,
