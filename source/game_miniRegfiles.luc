@@ -35,6 +35,11 @@ module game_miniRegfiles (
     //output counter_out[16]
 
   ) {
+  var i;
+  
+  sig reversed_led_1[6], reversed_led_2[6], reversed_led_3[6],
+      reversed_led_4[6], reversed_led_5[6], reversed_led_6[6];
+  
   .clk(clk){
     .rst(rst){
       dff score[16](#INIT(0));
@@ -65,13 +70,19 @@ module game_miniRegfiles (
     points = score.q;
     timer = current_timer_gameplay.q;
     
-    mem_trail1 = led_row1.q;
+    for(i=0;i<6;i++){
+      reversed_led_1[i] = led_row1.q[5-i];
+    }
+    
+    mem_trail1 = reversed_led_1;
     mem_trail2 = led_row2.q;
     mem_trail3 = led_row3.q;
     mem_trail4 = led_row4.q;
     mem_trail5 = led_row5.q;
     mem_trail6 = led_row6.q;
-
+    
+    
+    
 
     
     
