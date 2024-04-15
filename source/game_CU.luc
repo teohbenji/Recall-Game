@@ -149,7 +149,8 @@ module game_CU (
     } else {
       case(game_fsm.q){
         game_fsm.START_NEW_GAME: 
-          if (start_button){
+          ledsel = b00;
+          if (start_button){ //reset button instantly bypasses.
               game_fsm.d = game_fsm.RESET_SCORE_TO_0;
           }
                
@@ -1098,8 +1099,8 @@ module game_CU (
             //outsel = b01;
             //ledsel = b01;
             
-            //TODO: CHANGE TO IDLE
-            game_fsm.d = game_fsm.SET_TIMER_90S; 
+            game_fsm.d = game_fsm.IDLE; 
+          
           
           game_fsm.IDLE: 
           
@@ -1122,7 +1123,7 @@ module game_CU (
             else if (right_button){
                 game_fsm.d = game_fsm.RIGHT_CHECKER;
             }*/
-            if (reset_button){ //change back to else if
+            if (reset_button){ //change back to else if, change back to start button
                 game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
             }          
             else{
@@ -1158,21 +1159,20 @@ module game_CU (
               game_fsm.d = game_fsm.IDLE;*/
 
            game_fsm.DISPLAY_SAD_FACE: 
-            //alufn = A;
-            //asel = b0010; 
-            //bsel = b0001 ;
-            we_regfile = b0;
-            //regfile_write_address = b0011;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
-            //wdsel = b00;
-            romsel = b110;
-            outsel = b01;
-            ledsel = b00;
-            colsel = b00;
-            
-          
-            game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
+              //alufn = A;
+              //asel = b0010; 
+              //bsel = b0001 ;
+              we_regfile = b0;
+              //regfile_write_address = b0011;
+              //regfile_read_address_a = ;
+              //regfile_read_address_b = ;
+              //wdsel = b00;
+              romsel = b110;
+              outsel = b01;
+              ledsel = b00;
+              colsel = b01;
+              
+              game_fsm.d = game_fsm.START_NEW_GAME;
           
         }
       }
