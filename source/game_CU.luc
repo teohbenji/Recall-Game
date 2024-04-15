@@ -1215,17 +1215,21 @@ module game_CU (
           
           
           //PROBLEM FOUND: OUTPUT OF THIS IS 0, THATS WHY OR OPERATIONS DID NOTHING
+          //CURRENT TEST: shift by 1, so output of strip: 010000
+          //RESULT: STILL 0
+          //TEST 2: SHIFT ANY RANDOM NUMBER BY 1 TO SEE THE RESULT
           game_fsm.CONVERT_X_6BIT: 
             //Convert to get current position of x in the row
             //shifting right 6b10..0 by x
             //SHR is shift A by B bits
             alufn = b100001; //SHR
             asel = b1001; //6b10..0
-            bsel = b0000;
+            bsel = b0000; //TODO: ORIGINAL CODE
+            bsel = b0010; //test case: 1, but original should be x
             we_regfile = b1;
             regfile_write_address = b1101; //store new position for memtrail in temp reg 13
             //regfile_read_address_a = b0011; 
-            regfile_read_address_b = b0001 ; //x
+            //regfile_read_address_b = b0001 ; //x
             wdsel = b00;
             //romsel = b001;
             //outsel = b01;
@@ -1235,15 +1239,15 @@ module game_CU (
             //game_fsm.d = game_fsm.CHECK_Y_0; //TODO: CHANGE BACK TO ORIGINAL
             game_fsm.d = game_fsm.TEST_TRAIL_X;
            
-           //TEST state, every time press button, x moves to the right
+           //TEST state to set value of mem trail
           //set 0x6 register for y0 mem trail to be value of A
           game_fsm.TEST_TRAIL_X:
             alufn = b011010; //"A"
             asel = b0000; 
            //bsel = b0001 ;
             we_regfile = b1;
-            regfile_write_address = b0110; //update y0
-            regfile_read_address_a = b1101; //current x position
+            regfile_write_address = b0110; //update y0 trail
+            regfile_read_address_a = b1101; //convert_x_6bit output
             //regfile_read_address_b = ;
             wdsel = b00;
             //romsel = b100;
