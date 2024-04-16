@@ -27,7 +27,8 @@ module game_CU (
   ) {
   
   .clk(clk){
-    fsm game_fsm={     
+    fsm game_fsm={
+      WIN_SET_TIMER_S10,  //TODO:DELETE LATER AFTER TESTING   
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -184,8 +185,17 @@ module game_CU (
       DISPLAY_SAD_FACE,
       LOSE_CHECK_TIMER_0,
       LOSE_CHECK_TIMER_0_BRANCH,
-      LOSE_DECREASE_TIMER_1
-        
+      LOSE_DECREASE_TIMER_1,
+      
+      
+      /*
+      DISPLAY HAPPY FACE AFTER WINNING GAME
+      */
+      //WIN_SET_TIMER_S10, //TODO:UNCOMMENT LATER AFTER TESTING
+      DISPLAY_HAPPY_FACE, 
+      WIN_CHECK_TIMER_0,
+      WIN_CHECK_TIMER_0_BRANCH,
+      WIN_DECREASE_TIMER_1  
       
       
       
@@ -707,7 +717,7 @@ module game_CU (
             regfile_read_address_b = b1111; // temp reg 15
             
             if (regfile_datain[0]){                      //direct read in
-              game_fsm.d = game_fsm.DISPLAY_CORRECT_COLOUR;
+              game_fsm.d = game_fsm.SET_CORRECT_COLOUR_MAP;
             }
             else{
               game_fsm.d = game_fsm.C_DECREASE_TIMER_1;
@@ -725,9 +735,10 @@ module game_CU (
             
             game_fsm.d = game_fsm.MAP_C_DISPLAY;
           
+          //Sets map timer to 5s
           game_fsm.SET_CORRECT_COLOUR_MAP:
             alufn = b011010; //"A"
-            asel = b0101; 
+            asel = b0101; //5 secs, can change later
             we_regfile = b1;
             regfile_write_address = b0101;
             wdsel = b00;
@@ -1412,7 +1423,69 @@ module game_CU (
               regfile_read_address_a = b0101; //read from map timer
               wdsel = b00;
               
-              game_fsm.d = game_fsm.DISPLAY_SAD_FACE;         
+              game_fsm.d = game_fsm.DISPLAY_SAD_FACE; 
+          
+          /*
+          DISPLAY HAPPY FACE
+          
+          */
+          
+          //TODO: HAVENT CONNECTED TO rest of FSM!!!!!!!!
+          //set map timer to 10s
+          game_fsm.WIN_SET_TIMER_S10: 
+            alufn = b011010; //"A"
+            asel = b0111; //10
+            we_regfile = b1;
+            regfile_write_address = b0101; //write to map timer reg
+            wdsel = b00;
+            
+            game_fsm.d = game_fsm.DISPLAY_HAPPY_FACE;   
+
+          game_fsm.DISPLAY_HAPPY_FACE:
+            we_regfile = b0;  
+            romsel = b101; //map 17: happy face
+            outsel = b01; //display full map
+            ledsel = b00; //display rom output 
+            colsel = b10; //green color
+            
+            if (decrease_timer_mapdisplay){
+            game_fsm.d = game_fsm.WIN_CHECK_TIMER_0;
+            }
+            else {
+            game_fsm.d = game_fsm.DISPLAY_HAPPY_FACE;}
+                      
+          game_fsm.WIN_CHECK_TIMER_0: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0001; //0
+            we_regfile = b1;
+            regfile_write_address = b1111; // write to temp reg 15
+            regfile_read_address_a = b0101; //read from map timer
+            wdsel = b00;
+
+            game_fsm.d = game_fsm.WIN_CHECK_TIMER_0_BRANCH;          
+                             
+          game_fsm.WIN_CHECK_TIMER_0_BRANCH: 
+            regfile_read_address_b = b1111; // temp reg 15
+            
+            if (regfile_datain[0]){                      //direct read in
+              game_fsm.d = game_fsm.START_NEW_GAME;
+            }
+            else{
+              game_fsm.d = game_fsm.WIN_DECREASE_TIMER_1;
+            }
+                                    
+          game_fsm.WIN_DECREASE_TIMER_1: 
+            alufn = b000001;  //SUB
+            asel = b0000; 
+            bsel = b0010 ;
+            we_regfile = b1;
+            regfile_write_address = b0101;
+            regfile_read_address_a = b0101;
+            wdsel = b00;
+            
+            game_fsm.d = game_fsm.DISPLAY_HAPPY_FACE;
+                  
           
         }
       }
