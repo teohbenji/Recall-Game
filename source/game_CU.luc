@@ -1027,26 +1027,21 @@ module game_CU (
           game_fsm.PULL_BIT_ROM: 
             we_regfile = b1;
             regfile_write_address = b1110; //write into temp reg 14
-            wdsel = b01; //pull data from ROM
-            romsel = b000;
+            wdsel = b01; //write data from rom
+            romsel = b000; //input correct map index
             outsel = b00; //taking single bit
    
             game_fsm.d = game_fsm.CHECK_COLLISION;
           
-          //check rom bit = 0???    
+          //check rom bit = 0 
           game_fsm.CHECK_COLLISION: 
-              alufn = b110011; //CMPEQ
+              alufn = b110011; //CMPEQ 
               asel = b0000; 
-              bsel = b0010 ;
+              bsel = b0001; //0
               we_regfile = b1;
-              regfile_write_address = b1111; // read from temp reg 14
-              regfile_read_address_a = b1100;
-              //regfile_read_address_a = ;
-              //regfile_read_address_b = ;
-              wdsel = b00;
-              //romsel = b001;
-              //outsel = b01;
-              //ledsel = b00;
+              regfile_write_address = b1111; // write into temp reg 15
+              regfile_read_address_a = b1110; //read from temp reg 14
+              wdsel = b00; //write data from alufn
       
               
               game_fsm.d = game_fsm.CHECK_COLLISION_BRANCH;
