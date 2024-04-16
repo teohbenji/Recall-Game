@@ -109,6 +109,7 @@ module game_miniBeta (
       b0110 : inputAlu_a = b0111;
       b0111 : inputAlu_a = b1010;
       b1000 : inputAlu_a = b00111100; //0x3C for 60s timer(?)
+      
       //USED FOR X BIT CONVERSION -> 1 bit use b0011
       b1001 : inputAlu_a = 6b100000;
       b1010 : inputAlu_a = 6b010000;
@@ -122,14 +123,14 @@ module game_miniBeta (
     //bsel mux
     case(game_controlunit.bsel){
       b0000 : inputAlu_b = players.out_b;
-      b0001 : inputAlu_b = b0 ;
-      b0010 : inputAlu_b = b1;
-      b0011 : inputAlu_b = b10;
-      b0100 : inputAlu_b = b11;
-      b0101 : inputAlu_b = b100;
-      b0110 : inputAlu_b = b101;
-      b0111 : inputAlu_b = b110;
-      b1000 : inputAlu_b = b111;
+      b0001 : inputAlu_b = 16b0000000000000000;
+      b0010 : inputAlu_b = 16b0000000000000001;
+      b0011 : inputAlu_b = 16b0000000000000010;
+      b0100 : inputAlu_b = 16b0000000000000011;
+      b0101 : inputAlu_b = 16b0000000000000100;
+      b0110 : inputAlu_b = 16b0000000000000101;
+      b0111 : inputAlu_b = 16b0000000000000110;
+      b1000 : inputAlu_b = 16b0000000000000111;
       default: //necessary to init
           inputAlu_b = players.out_b;
       

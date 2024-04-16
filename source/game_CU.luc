@@ -1190,7 +1190,7 @@ module game_CU (
             asel = b0000; 
             we_regfile = b1;
             regfile_write_address = b0110; //update y0 trail
-            regfile_read_address_a = b0001; //reading from x coord
+            regfile_read_address_a = b1101; //reading output of convert_x_6bit
             wdsel = b00;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
@@ -1206,7 +1206,7 @@ module game_CU (
             wdsel = b00;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.TEST_TRAIL_X; //TESTING IF X INCREASE WORKS
+            game_fsm.d = game_fsm.CONVERT_X_6BIT; //TESTING IF X INCREASE WORKS
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
@@ -1219,7 +1219,7 @@ module game_CU (
             wdsel = b00;
             ledsel = b01;
 
-            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+            game_fsm.d = game_fsm.TEST_TRAIL_X;
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR
