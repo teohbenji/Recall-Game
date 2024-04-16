@@ -124,7 +124,9 @@ module game_CU (
       
       //MOVEMENT checks and coord updates
       UP_INCREASEBY1,
+      DOWN_DECREASEBY1,
       RIGHT_INCREASEBY1,
+      LEFT_DECREASEBY1,
       
       //MEMORY TRAILS
       CONVERT_X_6BIT,
@@ -802,14 +804,16 @@ module game_CU (
               game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
             }
         
-            /*
+            
             else if (down_button){
-                game_fsm.d = game_fsm.DOWN_CHECKER;
+                //game_fsm.d = game_fsm.DOWN_CHECKER;
+                game_fsm.d = game_fsm.DOWN_DECREASEBY1;
             }
             else if (left_button){
-                game_fsm.d = game_fsm.LEFT_CHECKER;
+                //game_fsm.d = game_fsm.LEFT_CHECKER;
+                game_fsm.d = game_fsm.LEFT_DECREASEBY1;
             }
-            */            
+                      
 
             else if (reset_button){ 
                 game_fsm.d = game_fsm.DISPLAY_SAD_FACE; 
@@ -851,6 +855,19 @@ module game_CU (
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
+      
+          //Decrease x by 1
+          game_fsm.LEFT_DECREASEBY1:
+            alufn = b000001; //SUB
+            asel = b0000; 
+            bsel = b0010; // 1
+            we_regfile = b1;
+            regfile_write_address = b0001; //write to xcoord
+            regfile_read_address_a = b0001; //read from xcoord
+            wdsel = b00;
+    
+            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+            game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           //Increase y by 1
           game_fsm.UP_INCREASEBY1:
@@ -863,7 +880,20 @@ module game_CU (
             wdsel = b00;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+            game_fsm.d = game_fsm.CONVERT_X_6BIT; 
+      
+          //Increase y by 1
+          game_fsm.DOWN_DECREASEBY1:
+            alufn = b000001; //SUB
+            asel = b0000; 
+            bsel = b0010; // 1
+            we_regfile = b1;
+            regfile_write_address = b0010; //write to ycoord
+            regfile_read_address_a = b0010; //read from ycoord
+            wdsel = b00;
+    
+            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+            game_fsm.d = game_fsm.CONVERT_X_6BIT; 
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
