@@ -877,15 +877,15 @@ module game_CU (
               
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
-                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+                game_fsm.d = game_fsm.PULL_BIT_ROM; 
+                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.RIGHT_INCREASEBY1; //if x !=5 increase xcoord first
               }
           
           //Increase x by 1
-          game_fsm.RIGHT_INCREASEBY1:
+          game_fsm.RIGHT_INCREASEBY1: 
             alufn = b000000; //ADD
             asel = b0000; 
             bsel = b0010; // 1
@@ -894,8 +894,8 @@ module game_CU (
             regfile_read_address_a = b0001; //read from xcoord
             wdsel = b00;
     
-            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT;
+            game_fsm.d = game_fsm.PULL_BIT_ROM;
+            //game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           /*
           LEFT MOVEMENT CHECKER
@@ -918,8 +918,8 @@ module game_CU (
               
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
-                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+                game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.LEFT_DECREASEBY1; //if x !=0 decrease xcoord first
@@ -935,8 +935,8 @@ module game_CU (
             regfile_read_address_a = b0001; //read from xcoord
             wdsel = b00;
     
-            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT;
+            game_fsm.d = game_fsm.PULL_BIT_ROM;
+            //game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           /*
           UP MOVEMENT CHECKER
@@ -959,8 +959,8 @@ module game_CU (
               
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
-                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+                game_fsm.d = game_fsm.PULL_BIT_ROM; 
+                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.UP_INCREASEBY1; //if y!=5 increase ycoord first
@@ -976,8 +976,8 @@ module game_CU (
             regfile_read_address_a = b0010; //read from ycoord
             wdsel = b00;
     
-            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT; 
+            game_fsm.d = game_fsm.PULL_BIT_ROM; 
+            //game_fsm.d = game_fsm.CONVERT_X_6BIT; 
       
            /*
           DOWN MOVEMENT CHECKER
@@ -1000,8 +1000,8 @@ module game_CU (
               
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
-                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+                game_fsm.d = game_fsm.PULL_BIT_ROM;
+                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.DOWN_DECREASEBY1; //if y!=0 DECREASE ycoord first
@@ -1017,8 +1017,50 @@ module game_CU (
             regfile_read_address_a = b0010; //read from ycoord
             wdsel = b00;
     
-            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT; 
+            game_fsm.d = game_fsm.PULL_BIT_ROM;
+            //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+          
+          /*
+          COLLISION CHECKS
+          */
+          
+          game_fsm.PULL_BIT_ROM: 
+            we_regfile = b1;
+            regfile_write_address = b1110; //write into temp reg 14
+            wdsel = b01; //pull data from ROM
+            romsel = b000;
+            outsel = b00; //taking single bit
+   
+            game_fsm.d = game_fsm.CHECK_COLLISION;
+          
+          //check rom bit = 0???    
+          game_fsm.CHECK_COLLISION: 
+              alufn = b110011; //CMPEQ
+              asel = b0000; 
+              bsel = b0010 ;
+              we_regfile = b1;
+              regfile_write_address = b1111; // read from temp reg 14
+              regfile_read_address_a = b1100;
+              //regfile_read_address_a = ;
+              //regfile_read_address_b = ;
+              wdsel = b00;
+              //romsel = b001;
+              //outsel = b01;
+              //ledsel = b00;
+      
+              
+              game_fsm.d = game_fsm.CHECK_COLLISION_BRANCH;
+                
+                
+           game_fsm.CHECK_COLLISION_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+              
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
+              }
+              else{
+                game_fsm.d = game_fsm.CONVERT_X_6BIT;
+              }
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
