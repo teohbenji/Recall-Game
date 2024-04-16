@@ -970,8 +970,7 @@ module game_CU (
                 game_fsm.d = game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL;
               }
               else{
-                //game_fsm.d = game_fsm.CHECK_Y_3;
-                game_fsm.d = game_fsm.Y3_UPDATE_DISPLAY_MEMTRAIL; 
+                game_fsm.d = game_fsm.CHECK_Y_3; 
               } 
           
           game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL: 
@@ -986,6 +985,29 @@ module game_CU (
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE;
+      
+          game_fsm.CHECK_Y_3: 
+              alufn = b110011; //CMPEQ
+              asel = b0000; 
+              bsel = b0100; //3
+              we_regfile = b1;
+              regfile_write_address = b1111; // temp reg 15
+              regfile_read_address_a = b0010; //ycoord
+              wdsel = b00;
+              
+              game_fsm.d = game_fsm.CHECK_Y_3_BRANCH;
+          
+          
+          game_fsm.CHECK_Y_3_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+      
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.Y3_UPDATE_DISPLAY_MEMTRAIL;
+              }
+              else{
+                //game_fsm.d = game_fsm.CHECK_Y_4;
+                game_fsm.d = game_fsm.Y4_UPDATE_DISPLAY_MEMTRAIL; 
+              }
           
           game_fsm.Y3_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR;
@@ -994,6 +1016,19 @@ module game_CU (
               we_regfile = b1;
               regfile_write_address = b1001; //write to memtrail 4
               regfile_read_address_a = b1001; //read from memtrail 4
+              regfile_read_address_b = b1101; // read form temp reg 13
+              wdsel = b00;
+              ledsel = b01;
+      
+              game_fsm.d = game_fsm.IDLE;
+      
+          game_fsm.Y4_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b1010; //write to memtrail 5
+              regfile_read_address_a = b1010; //read from memtrail 5
               regfile_read_address_b = b1101; // read form temp reg 13
               wdsel = b00;
               ledsel = b01;
