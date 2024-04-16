@@ -109,7 +109,12 @@ module game_miniBeta (
       b0110 : inputAlu_a = b0111;
       b0111 : inputAlu_a = b1010;
       b1000 : inputAlu_a = b00111100; //0x3C for 60s timer(?)
+      //USED FOR X BIT CONVERSION -> 1 bit use b0011
       b1001 : inputAlu_a = 6b100000;
+      b1010 : inputAlu_a = 6b010000;
+      b1011 : inputAlu_a = 6b001000;
+      b1100 : inputAlu_a = 6b000100;
+      b1101 : inputAlu_a = 6b000010;
       default : //b10 unused
           inputAlu_a = players.out_a;
     }

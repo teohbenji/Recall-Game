@@ -29,6 +29,7 @@ module game_CU (
   .clk(clk){
     fsm game_fsm={
       TEST_SHIFTER,
+      
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -127,6 +128,14 @@ module game_CU (
       UP_INCREASEBY1,
       RIGHT_INCREASEBY1,
       
+      //X COORD TO 6BIT CONVERSION
+      CHECK_X_0,
+      CHECK_X_0_BRANCH,
+      CONVERT_X_0,
+      CHECK_X_1,
+      CHECK_X_1_BRANCH,
+      CONVERT_X_1,
+      
       //MEMORY TRAILS
       CONVERT_X_6BIT,
       CHECK_Y_0,
@@ -135,6 +144,7 @@ module game_CU (
       Y1_UPDATE_DISPLAY_MEMTRAIL,
       TEST_TRAIL,
       TEST_TRAIL_X,
+      //TEST_SHIFTER,
       
       
       //End of round displays
@@ -1158,7 +1168,7 @@ module game_CU (
                 game_fsm.d = game_fsm.DISPLAY_SAD_FACE; 
                 
             } else if (right_button){ //TODO: delete whole block when done testing
-                game_fsm.d = game_fsm.TEST_TRAIL;
+                game_fsm.d = game_fsm.TEST_TRAIL; //TEST display 000111 on LEDs
             }         
             else{
                 game_fsm.d = game_fsm.IDLE; 
@@ -1196,6 +1206,41 @@ module game_CU (
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM;
             game_fsm.d = game_fsm.CONVERT_X_6BIT;*/
+         
+      
+          /*TEST STATES DELETE ONCE DONE*/
+            //TEST state to set value of mem trail
+          //directly display converted x 6 bit
+          game_fsm.TEST_TRAIL_X:
+            alufn = b011010; //"A"
+            asel = b0000; 
+           //bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b0110; //update y0 trail
+            regfile_read_address_a = b1101; //convert_x_6bit output
+            //regfile_read_address_b = ;
+            wdsel = b00;
+            //romsel = b100;
+            //outsel = b01;
+            ledsel = b01;
+            game_fsm.d = game_fsm.IDLE;
+      
+           game_fsm.TEST_SHIFTER: 
+            //Convert to get current position of x in the row
+            //shifting right 6b10..0 by x
+            //SHR is shift A by B bits
+            alufn = b100001; //"A"
+            asel = b1001; //b100000
+            bsel = b0010; //test case: 1
+            we_regfile = b1;
+            regfile_write_address = b0110; //write directly to memtrail 0
+
+            wdsel = b00;
+            ledsel = b01;
+
+            
+            //EXPPECTED OUTPUT b010000
+            game_fsm.d = game_fsm.TEST_SHIFTER;
           
           //Increase x by 1
           game_fsm.RIGHT_INCREASEBY1:
@@ -1214,8 +1259,28 @@ module game_CU (
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
             //game_fsm.d = game_fsm.CONVERT_X_6BIT;
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
+      
+          //CONVERSION OF X TO 6 BITS STATES
+          
+           game_fsm.CHECK_X_0: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0001;
+            we_regfile = b1;
+            regfile_write_address = b1111; // temp reg 15
+            regfile_read_address_a = b0010 ;
+            //regfile_read_address_b = b1100 ;
+            wdsel = b00;
+            //romsel = b001;
+            //outsel = b01;
+            //ledsel = b00;
+    
+            
+            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+       
           
           
+          /*
           //PROBLEM FOUND: OUTPUT OF THIS IS 0, THATS WHY OR OPERATIONS DID NOTHING
           //CURRENT TEST: shift by 1, so output of strip: 010000
           //RESULT: STILL 0
@@ -1239,40 +1304,9 @@ module game_CU (
     
             
             //game_fsm.d = game_fsm.CHECK_Y_0; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.TEST_TRAIL_X;
+            game_fsm.d = game_fsm.TEST_TRAIL_X;*/
            
-           //TEST state to set value of mem trail
-          //set 0x6 register for y0 mem trail to be value of A
-          game_fsm.TEST_TRAIL_X:
-            alufn = b011010; //"A"
-            asel = b0000; 
-           //bsel = b0001 ;
-            we_regfile = b1;
-            regfile_write_address = b0110; //update y0 trail
-            regfile_read_address_a = b1101; //convert_x_6bit output
-            //regfile_read_address_b = ;
-            wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            ledsel = b01;
-            game_fsm.d = game_fsm.IDLE;
-      
-           game_fsm.TEST_SHIFTER: 
-            //Convert to get current position of x in the row
-            //shifting right 6b10..0 by x
-            //SHR is shift A by B bits
-            alufn = b011010; //"A"
-            asel = b1001; //b111100
-            //bsel = b0010; //test case: 1
-            we_regfile = b1;
-            regfile_write_address = b0110; //write directly to memtrail 0
-
-            wdsel = b00;
-            ledsel = b01;
-
-            
-            //EXPPECTED OUTPUT b011110
-            game_fsm.d = game_fsm.TEST_SHIFTER;
+         
           
          
       
