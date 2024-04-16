@@ -126,20 +126,31 @@ module game_CU (
       UP_INCREASEBY1,
       RIGHT_INCREASEBY1,
       
-      //X COORD TO 6BIT CONVERSION
-      CHECK_X_0,
-      CHECK_X_0_BRANCH,
-      CONVERT_X_0,
-      CHECK_X_1,
-      CHECK_X_1_BRANCH,
-      CONVERT_X_1,
-      
       //MEMORY TRAILS
       CONVERT_X_6BIT,
+      
       CHECK_Y_0,
       CHECK_Y_0_BRANCH,
       Y0_UPDATE_DISPLAY_MEMTRAIL,
+      
+      CHECK_Y_1,
+      CHECK_Y_1_BRANCH,
       Y1_UPDATE_DISPLAY_MEMTRAIL,
+      
+      CHECK_Y_2,
+      CHECK_Y_2_BRANCH,
+      Y2_UPDATE_DISPLAY_MEMTRAIL,
+      
+      CHECK_Y_3,
+      CHECK_Y_3_BRANCH,
+      Y3_UPDATE_DISPLAY_MEMTRAIL,
+      
+      CHECK_Y_4,
+      CHECK_Y_4_BRANCH,
+      Y4_UPDATE_DISPLAY_MEMTRAIL,
+      Y5_UPDATE_DISPLAY_MEMTRAIL,
+      
+      //for testing
       TEST_TRAIL,
       TEST_TRAIL_X,
       
@@ -872,7 +883,7 @@ module game_CU (
           game_fsm.CHECK_Y_0: 
             alufn = b110011; //CMPEQ
             asel = b0000; 
-            bsel = b0001 ;
+            bsel = b0001 ; //0
             we_regfile = b1;
             regfile_write_address = b1111; // temp reg 15
             regfile_read_address_a = b0010; //ycoord
@@ -889,7 +900,7 @@ module game_CU (
               }
               else{
                 //game_fsm.d = game_fsm.CHECK_Y_1; //TODO: REVERT BACK TO ORIGINAL
-                game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
+                game_fsm.d = game_fsm.CHECK_Y_1;
               }           
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
@@ -897,27 +908,62 @@ module game_CU (
               asel = b0000;  
               bsel = b0000;
               we_regfile = b1;
-              regfile_write_address = b0110; //write to memtrail0
-              regfile_read_address_a = b0110; // read from memtrail 0
+              regfile_write_address = b0110; //write to memtrail1
+              regfile_read_address_a = b0110; // read from memtrail 1
               regfile_read_address_b = b1101; //read from temp reg 13
               wdsel = b00;
               ledsel = b01;
       
-              game_fsm.d = game_fsm.IDLE; 
+              game_fsm.d = game_fsm.IDLE;
+         
+         game_fsm.CHECK_Y_1: 
+              alufn = b110011; //CMPEQ
+              asel = b0000; 
+              bsel = b0010; //1
+              we_regfile = b1;
+              regfile_write_address = b1111; // temp reg 15
+              regfile_read_address_a = b0010; //ycoord
+              wdsel = b00;
+              
+              game_fsm.d = game_fsm.CHECK_Y_1_BRANCH;
+          
+          
+          game_fsm.CHECK_Y_1_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+      
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
+              }
+              else{
+                //game_fsm.d = game_fsm.CHECK_Y_2; //TODO: REVERT BACK TO ORIGINAL
+                game_fsm.d = game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL;
+              } 
           
           game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR;
               asel = b0000; 
               bsel = b0000;
               we_regfile = b1;
-              regfile_write_address = b0111; //write to memtrail 1
-              regfile_read_address_a = b0111; //read from memtrail 1
+              regfile_write_address = b0111; //write to memtrail 2
+              regfile_read_address_a = b0111; //read from memtrail 2
               regfile_read_address_b = b1101; // read form temp reg 13
               wdsel = b00;
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE;
           
+          game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b1000; //write to memtrail 3
+              regfile_read_address_a = b1000; //read from memtrail 3
+              regfile_read_address_b = b1101; // read form temp reg 13
+              wdsel = b00;
+              ledsel = b01;
+      
+              game_fsm.d = game_fsm.IDLE;
           
           game_fsm.DISPLAY_SAD_FACE: 
               we_regfile = b0;
