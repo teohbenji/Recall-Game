@@ -843,6 +843,7 @@ module game_CU (
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
+          //Increase y by 1
           game_fsm.UP_INCREASEBY1:
             alufn = b000000; //ADD
             asel = b0000; 
@@ -853,7 +854,7 @@ module game_CU (
             wdsel = b00;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.TEST_TRAIL_X;  
+            game_fsm.d = game_fsm.CONVERT_X_6BIT;  
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
@@ -866,7 +867,7 @@ module game_CU (
             wdsel = b00;
             ledsel = b01;
 
-            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL; 
+            game_fsm.d = game_fsm.CHECK_Y_0; 
       
           game_fsm.CHECK_Y_0: 
             alufn = b110011; //CMPEQ
