@@ -799,7 +799,7 @@ module game_CU (
             
             /*
             //else if (right_button){ //TODO: CHANGE BACK TO ORIGINAL
-            if (right_button){
+            if (right_button){ //TODO: DONT FORGET TO IMPLEMENT TO TEST!
                 //game_fsm.d = game_fsm.RIGHT_CHECKER;
               game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
             }*/
@@ -935,8 +935,7 @@ module game_CU (
                 game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
               }
               else{
-                //game_fsm.d = game_fsm.CHECK_Y_2; //TODO: REVERT BACK TO ORIGINAL
-                game_fsm.d = game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL;
+                game_fsm.d = game_fsm.CHECK_Y_2; 
               } 
           
           game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
@@ -951,6 +950,29 @@ module game_CU (
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE;
+      
+          game_fsm.CHECK_Y_2: 
+              alufn = b110011; //CMPEQ
+              asel = b0000; 
+              bsel = b0011; //2
+              we_regfile = b1;
+              regfile_write_address = b1111; // temp reg 15
+              regfile_read_address_a = b0010; //ycoord
+              wdsel = b00;
+              
+              game_fsm.d = game_fsm.CHECK_Y_2_BRANCH;
+          
+          
+          game_fsm.CHECK_Y_2_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+      
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL;
+              }
+              else{
+                //game_fsm.d = game_fsm.CHECK_Y_3;
+                game_fsm.d = game_fsm.Y3_UPDATE_DISPLAY_MEMTRAIL; 
+              } 
           
           game_fsm.Y2_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR;
@@ -959,6 +981,19 @@ module game_CU (
               we_regfile = b1;
               regfile_write_address = b1000; //write to memtrail 3
               regfile_read_address_a = b1000; //read from memtrail 3
+              regfile_read_address_b = b1101; // read form temp reg 13
+              wdsel = b00;
+              ledsel = b01;
+      
+              game_fsm.d = game_fsm.IDLE;
+          
+          game_fsm.Y3_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b1001; //write to memtrail 4
+              regfile_read_address_a = b1001; //read from memtrail 4
               regfile_read_address_b = b1101; // read form temp reg 13
               wdsel = b00;
               ledsel = b01;
