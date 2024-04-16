@@ -132,6 +132,14 @@ module game_CU (
       RIGHT_INCREASEBY1,
       LEFT_DECREASEBY1,
       
+      
+      //<CHECK COLLISION//
+      PULL_BIT_ROM,
+      CHECK_COLLISION,
+      CHECK_COLLISION_BRANCH,
+      //CHECK COLLISION>//
+      
+      
       //MEMORY TRAILS
       CONVERT_X_6BIT,
       
@@ -799,8 +807,8 @@ module game_CU (
             
             //else if (up_button){ //TODO: CHANGE BACK TO ORIGINAL
             if (up_button){ 
-              //game_fsm.d = game_fsm.UP_CHECKER;
-              game_fsm.d = game_fsm.UP_INCREASEBY1;
+              game_fsm.d = game_fsm.UP_CHECKER;
+              //game_fsm.d = game_fsm.UP_INCREASEBY1;
             } 
             
             else if (right_button){ 
@@ -810,8 +818,8 @@ module game_CU (
         
             
             else if (down_button){
-                //game_fsm.d = game_fsm.DOWN_CHECKER;
-                game_fsm.d = game_fsm.DOWN_DECREASEBY1;
+                game_fsm.d = game_fsm.DOWN_CHECKER;
+                //game_fsm.d = game_fsm.DOWN_DECREASEBY1;
             }
             else if (left_button){
                 game_fsm.d = game_fsm.LEFT_CHECKER;
@@ -930,6 +938,34 @@ module game_CU (
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
+          /*
+          UP MOVEMENT CHECKER
+          */
+      
+          //Check if y=5
+          game_fsm.UP_CHECKER: 
+            alufn = b110011; //CMPEQ      
+            asel = b0000; 
+            bsel = b0110; //5
+            we_regfile = b1;
+            regfile_write_address = b1111; //write to temp reg 15
+            regfile_read_address_a = b0010; //read from ycoord
+            wdsel = b00;
+        
+            game_fsm.d = game_fsm.UP_CHECKER_BRANCH;  
+            
+          game_fsm.UP_CHECKER_BRANCH: 
+              regfile_read_address_b = b1111; // read from temp reg 15
+              
+              if (regfile_datain[0]){                      //direct read in
+                //if x = 0 directly go to checks
+                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+              }
+              else{
+                game_fsm.d = game_fsm.UP_INCREASEBY1; //if y!=5 increase ycoord first
+              }
+          
           //Increase y by 1
           game_fsm.UP_INCREASEBY1:
             alufn = b000000; //ADD
@@ -943,6 +979,34 @@ module game_CU (
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
             game_fsm.d = game_fsm.CONVERT_X_6BIT; 
       
+           /*
+          DOWN MOVEMENT CHECKER
+          */
+      
+          //Check if y=0
+          game_fsm.DOWN_CHECKER: 
+            alufn = b110011; //CMPEQ      
+            asel = b0000; 
+            bsel = b001; //0
+            we_regfile = b1;
+            regfile_write_address = b1111; //write to temp reg 15
+            regfile_read_address_a = b0010; //read from ycoord
+            wdsel = b00;
+        
+            game_fsm.d = game_fsm.DOWN_CHECKER_BRANCH;  
+            
+          game_fsm.DOWN_CHECKER_BRANCH: 
+              regfile_read_address_b = b1111; // read from temp reg 15
+              
+              if (regfile_datain[0]){                      //direct read in
+                //if x = 0 directly go to checks
+                //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+                game_fsm.d = game_fsm.CONVERT_X_6BIT;  
+              }
+              else{
+                game_fsm.d = game_fsm.DOWN_DECREASEBY1; //if y!=0 DECREASE ycoord first
+              }
+          
           //Increase y by 1
           game_fsm.DOWN_DECREASEBY1:
             alufn = b000001; //SUB
