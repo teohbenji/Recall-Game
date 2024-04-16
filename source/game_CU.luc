@@ -27,7 +27,8 @@ module game_CU (
   ) {
   
   .clk(clk){
-    fsm game_fsm={      
+    fsm game_fsm={    
+      TEST_ALU,  
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -1182,7 +1183,18 @@ module game_CU (
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
            
-          
+          game_fsm.TEST_ALU:
+            alufn = b100001; //"SHR"
+            asel = b1001; //b100000
+            bsel = b0001; //shift right by 1 bit -> b010000
+            we_regfile = b1;
+            regfile_write_address = b1101; //write in temp reg 13 for testing
+            //regfile_read_address_b = b0001; //read from x coord
+
+            wdsel = b00;
+            ledsel = b01;
+
+            game_fsm.d = game_fsm.TEST_TRAIL_X; //viewing converted x bit output now
       
           
           game_fsm.TEST_TRAIL_X:
@@ -1219,7 +1231,7 @@ module game_CU (
             wdsel = b00;
             ledsel = b01;
 
-            game_fsm.d = game_fsm.TEST_TRAIL_X;
+            game_fsm.d = game_fsm.TEST_TRAIL_X; //viewing converted x bit output now
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR

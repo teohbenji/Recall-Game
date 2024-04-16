@@ -24,7 +24,12 @@ module game_miniBeta (
     output inputledsel4[6],
     output inputledsel5[6],
     output inputledsel6[6],
-    output colseloutput[2]
+    output colseloutput[2],
+    output alu_z,
+    output alu_v,
+    output alu_n,
+    output alu_out[16]
+    
 
     //output decimal_counter_increase,
     //output decimal_counter_rst
@@ -98,6 +103,8 @@ module game_miniBeta (
     //bootstrap reg_b output to CU for convenient branching conditions
     game_controlunit.regfile_datain = players.out_b;
     
+    
+    
     //asel mux
     case(game_controlunit.asel){
       b0000 : inputAlu_a = players.out_a;
@@ -140,6 +147,12 @@ module game_miniBeta (
     game_alu.a = inputAlu_a;
     game_alu.b = inputAlu_b;
     game_alu.alufn_signal = game_controlunit.alufn;
+    
+    //output for ioled to display alu output
+    alu_n = game_alu.n;
+    alu_out = game_alu.out;
+    alu_v = game_alu.v;
+    alu_z = game_alu.z;
    
 
     

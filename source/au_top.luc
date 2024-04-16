@@ -106,6 +106,9 @@ module au_top (
     outled_4 = ws2812b.outled_4; 
     outled_5 = ws2812b.outled_5; 
     outled_6 = ws2812b.outled_6;
+    
+    //io LEDs to view result of alu
+    io_led = c{{c{5b0, gameMachine.alu_z, gameMachine.alu_v, gameMachine.alu_n}}, {gameMachine.alu_out[15:8]}, {gameMachine.alu_out[7:0]}};
 
   }
 }
