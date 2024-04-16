@@ -1,4 +1,7 @@
 [![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/5YTzVbxp)
+
+- [Public repository](https://github.com/teohbenji/1d-project-NEW)
+
 ## 50.002 1D Project Group 31
 
 1007238 Benjamin Lee Ze Perng
@@ -9,7 +12,7 @@
 1006634 Royce Lim Way Tat
 1006614 Muhammadh Shahriyyah Khan s/o Mohamed Kamaludeen
 
-### Recall
+### What is Recall?
 Recall is a mind-numbing memory game that puts your ability to recall spatial information to the test. Every round, 3 mazes will be displayed in quick succession, and you have to remember them all as a random maze will be chosen! If you make one wrong move, you lose! If you take too long, you lose too! In order to win, you have to complete all 3 rounds. 
 
 ### Gameplay Demonstration
