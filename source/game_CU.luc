@@ -1225,18 +1225,6 @@ module game_CU (
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
       
-           game_fsm.TEST_SHIFTER: 
-            alufn = b100001; //"SHR"
-            asel = b1001; //b100000
-            bsel = b0100; //test case: 3 output: b000100
-            we_regfile = b1;
-            regfile_write_address = b0110; //write directly to led memtrail 0
-
-            wdsel = b00;
-            ledsel = b01;
-
-            game_fsm.d = game_fsm.TEST_SHIFTER;
-          
           //Increase x by 1
           game_fsm.RIGHT_INCREASEBY1:
             alufn = b000001; //ADD
@@ -1252,99 +1240,20 @@ module game_CU (
             //ledsel = b01;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            //game_fsm.d = game_fsm.CONVERT_X_6BIT;
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
       
-          /*CONVERSION OF X TO 6 BITS STATES
-           game_fsm.CHECK_X_0: 
-            alufn = b110011; //CMPEQ
-            asel = b0000; 
-            bsel = b0001;
+      //TODO: CHANGE NAME TO CONVERT_X_6BIT    
+          game_fsm.TEST_SHIFTER: 
+            alufn = b100001; //"SHR"
+            asel = b1001; //b100000
+            bsel = b0001; //test case: 0 output: b100000
             we_regfile = b1;
-            regfile_write_address = b1111; // temp reg 15
-            regfile_read_address_a = b0010 ;
-            //regfile_read_address_b = b1100 ;
+            regfile_write_address = b0110; //TODO: CURRENTLY led memtrail 0, CHANGE TO b1101
+
             wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-    
-            
-            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;*/
-       
-          
-          
-          /*
-          //PROBLEM FOUND: OUTPUT OF THIS IS 0, THATS WHY OR OPERATIONS DID NOTHING
-          //CURRENT TEST: shift by 1, so output of strip: 010000
-          //RESULT: STILL 0
-          //TEST 2: SHIFT ANY RANDOM NUMBER BY 1 TO SEE THE RESULT
-          game_fsm.CONVERT_X_6BIT: 
-            //Convert to get current position of x in the row
-            //shifting right 6b10..0 by x
-            //SHR is shift A by B bits
-            alufn = b100001; //SHR
-            asel = b1001; //6b10..0
-            //bsel = b0000; //TODO: ORIGINAL CODE
-            bsel = b0010; //test case: 1, but original should be x
-            we_regfile = b1;
-            regfile_write_address = b1101; //store new position for memtrail in temp reg 13
-            //regfile_read_address_a = b0011; 
-            //regfile_read_address_b = b0001 ; //x
-            wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-    
-            
-            //game_fsm.d = game_fsm.CHECK_Y_0; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.TEST_TRAIL_X;*/
-           
-         
-          
-         
-      
-           game_fsm.CHECK_Y_0: 
-            alufn = b110011; //CMPEQ
-            asel = b0000; 
-            bsel = b0001;
-            we_regfile = b1;
-            regfile_write_address = b1111; // temp reg 15
-            regfile_read_address_a = b0010 ;
-            //regfile_read_address_b = b1100 ;
-            wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-    
-            
-            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
-              
-          
-         /* 
-         game_fsm.CHECK_Y_0_BRANCH: 
-              //alufn = CMPEQ;
-              //asel = b0000; 
-              //bsel = b0001 ;
-              //we_regfile = b1;
-              //regfile_write_address = b1100;
-              //regfile_read_address_a = b0101;
-              regfile_read_address_b = b1111; // temp reg 15
-              //wdsel = b00;
-              //romsel = b001;
-              //outsel = b01;
-              //ledsel = b00;
-              //seven_seg_1 = b00;
-              //seven_seg_2 = b00;
-              
-              if (regfile_datain[0]){                      //direct read in
-                game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
-              }
-              else{
-                //game_fsm.d = game_fsm.CHECK_Y_1; //go memeory trail
-                game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
-         }
-      */           
+            ledsel = b01;
+
+            game_fsm.d = game_fsm.TEST_SHIFTER;
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR;
@@ -1360,25 +1269,7 @@ module game_CU (
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE; 
-              //game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
           
-          /*
-          game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
-              alufn = b011110; //OR;
-              asel = b0000; 
-              bsel = b0000;
-              we_regfile = b1;
-              regfile_write_address = b0111;
-              regfile_read_address_a = b0111; //current 2nd row
-              regfile_read_address_b = b1101; //temp reg 13
-              wdsel = b00;
-              //romsel = b001;
-              //outsel = b01;
-              ledsel = b01;
-      
-              game_fsm.d = game_fsm.IDLE;
-              //game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;  
-          */
           
           game_fsm.DISPLAY_SAD_FACE: 
               //alufn = A;
