@@ -229,7 +229,7 @@ module game_CU (
       case(game_fsm.q){
         game_fsm.START_NEW_GAME: 
           ledsel = b00;
-          if (start_button){ //reset button instantly bypasses.
+          if (start_button){ 
               game_fsm.d = game_fsm.RESET_SCORE_TO_0;
           }
                
@@ -808,7 +808,7 @@ module game_CU (
         
          game_fsm.SET_TIMER_90S: 
             alufn = b011010; //A
-            asel = b1000; //currently 60s, need to change the value in this reg
+            asel = b1000; //60s in reg, 90s in reality
             we_regfile = b1;
             regfile_write_address = b1100; //write to game timer 
             wdsel = b00;
@@ -936,7 +936,6 @@ module game_CU (
             wdsel = b00;
     
             game_fsm.d = game_fsm.PULL_BIT_ROM;
-            //game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           /*
           LEFT MOVEMENT CHECKER
@@ -960,7 +959,6 @@ module game_CU (
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
                 game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.LEFT_DECREASEBY1; //if x !=0 decrease xcoord first
@@ -977,7 +975,6 @@ module game_CU (
             wdsel = b00;
     
             game_fsm.d = game_fsm.PULL_BIT_ROM;
-            //game_fsm.d = game_fsm.CONVERT_X_6BIT;
           
           /*
           UP MOVEMENT CHECKER
@@ -1001,7 +998,6 @@ module game_CU (
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
                 game_fsm.d = game_fsm.PULL_BIT_ROM; 
-                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.UP_INCREASEBY1; //if y!=5 increase ycoord first
@@ -1018,7 +1014,6 @@ module game_CU (
             wdsel = b00;
     
             game_fsm.d = game_fsm.PULL_BIT_ROM; 
-            //game_fsm.d = game_fsm.CONVERT_X_6BIT; 
       
            /*
           DOWN MOVEMENT CHECKER
@@ -1058,7 +1053,6 @@ module game_CU (
             wdsel = b00;
     
             game_fsm.d = game_fsm.PULL_BIT_ROM;
-            //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
           
           /*
           COLLISION CHECKS
@@ -1241,7 +1235,6 @@ module game_CU (
                 game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
               }
               else{
-                //game_fsm.d = game_fsm.CHECK_Y_1; //TODO: REVERT BACK TO ORIGINAL
                 game_fsm.d = game_fsm.CHECK_Y_1;
               }           
           
