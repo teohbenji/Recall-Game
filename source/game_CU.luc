@@ -172,8 +172,6 @@ module game_CU (
       Y4_UPDATE_DISPLAY_MEMTRAIL,
       Y5_UPDATE_DISPLAY_MEMTRAIL,
       
-   
-      
       
       //<WIN SEQUENCE//
       INCREASE_SCORE_1,
@@ -1164,12 +1162,49 @@ module game_CU (
               regfile_read_address_b = b1111; // temp reg 15
               
               if (regfile_datain[0]){                      //direct read in
-                //game_fsm.d = game_fsm.INCREASE_SCORE_1; //TODO: CHANGE BACK TO ORIGINAL
-                game_fsm.d = game_fsm.RESET_TIMER_0; 
+                game_fsm.d = game_fsm.INCREASE_SCORE_1; 
               }
               else{
                 game_fsm.d = game_fsm.CONVERT_X_6BIT; //not at end of map, go to memory trail
               }  
+      
+          /*
+          SCORE CHECK
+          */
+          game_fsm.INCREASE_SCORE_1: 
+            alufn = b000000;  //ADD
+            asel = b0000; 
+            bsel = b0010; //1
+            we_regfile = b1;
+            regfile_write_address = b0000; //write to score
+            regfile_read_address_a = b0000; //read from score
+            wdsel = b00;
+    
+            game_fsm.d = game_fsm.CHECK_SCORE_3;   
+          
+          
+         game_fsm.CHECK_SCORE_3: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            //bsel = b0100; //3 TODO:UNCOMMENT AFTER TESTING
+            bsel = b0011; //currently 2, testing if win after 2nd round
+            we_regfile = b1;
+            regfile_write_address = b1111; // write to temp reg 15
+            regfile_read_address_a = b0000; //read from score
+            wdsel = b00;
+    
+            game_fsm.d = game_fsm.CHECK_SCORE_3_BRANCH;  
+          
+          
+         game_fsm.CHECK_SCORE_3_BRANCH: 
+            regfile_read_address_b = b1111; // temp reg 15
+            
+            if (regfile_datain[0]){                      
+              game_fsm.d = game_fsm.WIN_SET_TIMER_S10; //if score = 3 set :) face timer
+            }
+            else{
+              game_fsm.d = game_fsm.RESET_TIMER_0; //GO to reset round, starting with reset timer to 0
+            }  
           
           /*
           MEMORY TRAIL
@@ -1443,10 +1478,8 @@ module game_CU (
           
           /*
           DISPLAY HAPPY FACE
-          
           */
           
-          //TODO: HAVENT CONNECTED TO rest of FSM!!!!!!!!
           //set map timer to 10s
           game_fsm.WIN_SET_TIMER_S10: 
             alufn = b011010; //"A"
