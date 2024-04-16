@@ -139,6 +139,15 @@ module game_CU (
       CHECK_COLLISION_BRANCH,
       //CHECK COLLISION>//
       
+      //<CHECK END//
+      PULL_END_X_ROM,
+      CHECK_END_X,
+      CHECK_END_X_BRANCH,
+      PULL_END_Y_ROM,
+      CHECK_END_Y,
+      CHECK_END_Y_BRANCH,      
+      //CHECK END>//
+      
       
       //MEMORY TRAILS
       CONVERT_X_6BIT,
@@ -166,8 +175,7 @@ module game_CU (
       
       //for testing
       TEST_TRAIL,
-      TEST_TRAIL_X,
-      
+      TEST_TRAIL_X,      
       
       /*
       DISPLAY SAD FACE
@@ -1061,8 +1069,84 @@ module game_CU (
                 game_fsm.d = game_fsm.LOSE_SET_TIMER_S10;
               }
               else{
-                game_fsm.d = game_fsm.CONVERT_X_6BIT;
+                game_fsm.d = game_fsm.PULL_END_X_ROM;
               }
+          
+          
+          /*
+          CHECK IF AT END OF MAP
+          */
+          
+          game_fsm.PULL_END_X_ROM: 
+            we_regfile = b1;
+            regfile_write_address = b1110; //write into temp reg 14 rom data
+            wdsel = b01; //write data from rom
+            romsel = b000; //input correct map index
+            outsel = b10; //taking endx                  
+            
+            game_fsm.d = game_fsm.CHECK_END_X; 
+          
+          
+         game_fsm.CHECK_END_X: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0000;
+            we_regfile = b1;
+            regfile_write_address = b1111;  //write into temp reg 15
+            regfile_read_address_a = b0001; //read from xcoord
+            regfile_read_address_b = b1110; //read from temp reg 14 rom data
+            wdsel = b00;
+            
+            game_fsm.d = game_fsm.CHECK_END_X_BRANCH;
+          
+          
+        game_fsm.CHECK_END_X_BRANCH:  
+            regfile_read_address_b = b1111; // temp reg 15
+            
+            if (regfile_datain[0]){                      //direct read in
+              game_fsm.d = game_fsm.PULL_END_Y_ROM;
+            }
+            else{
+              game_fsm.d = game_fsm.CONVERT_X_6BIT; //not at end, go to mem trail
+            }
+          
+        game_fsm.PULL_END_Y_ROM: 
+            we_regfile = b1;
+            regfile_write_address = b1110; //write into temp reg 14
+            wdsel = b01; //write data from rom
+            romsel = b000; //input correct map index
+            outsel = b11; //taking endy
+    
+            game_fsm.d = game_fsm.CHECK_END_Y;
+              
+              
+         game_fsm.CHECK_END_Y: 
+           alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0000;    
+            we_regfile = b1;
+            regfile_write_address = b1111;  //write into temp reg 15
+            regfile_read_address_a = b0010; //read from ycoord
+            regfile_read_address_b = b1110; //read from temp reg 14 rom data
+            wdsel = b00;    
+            
+            game_fsm.d = game_fsm.CHECK_END_Y_BRANCH;
+          
+          
+          game_fsm.CHECK_END_Y_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+              
+              if (regfile_datain[0]){                      //direct read in
+                //game_fsm.d = game_fsm.INCREASE_SCORE_1; //TODO: CHANGE BACK TO ORIGINAL
+                game_fsm.d = game_fsm.RESET_TIMER_0; 
+              }
+              else{
+                game_fsm.d = game_fsm.CONVERT_X_6BIT; //not at end of map, go to memory trail
+              }  
+          
+          /*
+          MEMORY TRAIL
+          */
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
