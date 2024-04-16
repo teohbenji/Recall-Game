@@ -115,7 +115,7 @@ module game_miniBeta (
       b0101 : inputAlu_a = b0101;
       b0110 : inputAlu_a = b0111;
       b0111 : inputAlu_a = b1010;
-      b1000 : inputAlu_a = b00111100; //0x3C for 60s timer(?)
+      b1000 : inputAlu_a = b00111100; //TODO: CURRENTLY 60 SECONDS, CHANGE TO 90 SECONDS???
       
       //USED FOR X BIT CONVERSION -> 1 bit use b0011
       b1001 : inputAlu_a = 6b100000;

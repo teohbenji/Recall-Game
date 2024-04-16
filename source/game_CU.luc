@@ -27,8 +27,7 @@ module game_CU (
   ) {
   
   .clk(clk){
-    fsm game_fsm={
-      WIN_SET_TIMER_S10,  //TODO:DELETE LATER AFTER TESTING   
+    fsm game_fsm={  
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -111,7 +110,6 @@ module game_CU (
       SET_TIMER_90S,
       
       //Idle state timer
-      //IDLE, TODO: UNCOMMENT LATER
       CHECK_GAME_TIMER,
       BRANCH_GAME_TIMER,
       DECREASE_GAME_TIMER,
@@ -174,6 +172,15 @@ module game_CU (
       Y4_UPDATE_DISPLAY_MEMTRAIL,
       Y5_UPDATE_DISPLAY_MEMTRAIL,
       
+   
+      
+      
+      //<WIN SEQUENCE//
+      INCREASE_SCORE_1,
+      CHECK_SCORE_3,
+      CHECK_SCORE_3_BRANCH,
+      
+      
       //for testing
       TEST_TRAIL,
       TEST_TRAIL_X,      
@@ -191,7 +198,7 @@ module game_CU (
       /*
       DISPLAY HAPPY FACE AFTER WINNING GAME
       */
-      //WIN_SET_TIMER_S10, //TODO:UNCOMMENT LATER AFTER TESTING
+      WIN_SET_TIMER_S10, 
       DISPLAY_HAPPY_FACE, 
       WIN_CHECK_TIMER_0,
       WIN_CHECK_TIMER_0_BRANCH,
@@ -803,85 +810,95 @@ module game_CU (
         
          game_fsm.SET_TIMER_90S: 
             alufn = b011010; //A
-            asel = b1000; 
-            //bsel = b0001 ;
+            asel = b1000; //currently 60s, need to change the value in this reg
             we_regfile = b1;
-            regfile_write_address = b0101;
-            //regfile_read_address_a = b0101;
-            //regfile_read_address_b = ;
+            regfile_write_address = b1100; //write to game timer 
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            //ledsel = b01;
             
             game_fsm.d = game_fsm.IDLE; 
           
           
           game_fsm.IDLE: 
           
-            ledsel = b01;
-          //Check time first, more important
+            ledsel = b01;    
+        
             /*
+            Game timer: ONLY triggers once per second
+            */
+            
             if (decrease_timer_gameplay){
                 game_fsm.d = game_fsm.CHECK_GAME_TIMER;
             }
-            
-            
-        */
-         
-            //movement checker
-            
-            //else if (up_button){ //TODO: CHANGE BACK TO ORIGINAL
-            if (up_button){ 
+ 
+          
+            /*
+            Movement buttons
+            */
+            else if (up_button){ 
               game_fsm.d = game_fsm.UP_CHECKER;
-              //game_fsm.d = game_fsm.UP_INCREASEBY1;
             } 
             
             else if (right_button){ 
               game_fsm.d = game_fsm.RIGHT_CHECKER;
-              //game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
             }
         
             
             else if (down_button){
                 game_fsm.d = game_fsm.DOWN_CHECKER;
-                //game_fsm.d = game_fsm.DOWN_DECREASEBY1;
             }
             else if (left_button){
                 game_fsm.d = game_fsm.LEFT_CHECKER;
-                //game_fsm.d = game_fsm.LEFT_DECREASEBY1;
             }
-                      
+            
+            /*
+            Reset button
+            */          
 
             else if (reset_button){ 
                 game_fsm.d = game_fsm.LOSE_SET_TIMER_S10; 
-             }      
-            else{
-                game_fsm.d = game_fsm.IDLE; 
-            }
-           
-            /*DELETE TEST STATES BELOW ONCE DONE
-           game_fsm.TEST_TRAIL:
-            alufn = b011010; //"A"
-            asel = b0110; //display 000111
-            we_regfile = b1;
-            regfile_write_address = b0110; //update y0
-            wdsel = b00;
-            ledsel = b01;
-            game_fsm.d = game_fsm.IDLE;
+             } else {
+                game_fsm.d = game_fsm.IDLE;
+            }     
+          
+          
+          /*
+          GAME TIME STATES
+          */
+          
+          //CHECK IF GAME TIME = 0  
+          game_fsm.CHECK_GAME_TIMER:
+            alufn = b110011; //CMPEQ
+            asel = b0000;
+            bsel = b0001; //0
+            we_regfile = 1;
+            regfile_read_address_a = b1100; //read from game timer reg
+            regfile_write_address = b1111; // write to temp reg 15 
       
-          
-          game_fsm.TEST_TRAIL_X:
-            alufn = b011010; //"A"
-            asel = b0000; 
-            we_regfile = b1;
-            regfile_write_address = b0111; //update y1 trail
-            regfile_read_address_a = b0010; //reading y coord(0010), xcoord is 0001
-            wdsel = b00;
-            ledsel = b01;
-            game_fsm.d = game_fsm.IDLE;
-           */
-          
+            game_fsm.d = game_fsm.BRANCH_GAME_TIMER;
+      
+      
+          game_fsm.BRANCH_GAME_TIMER:
+            regfile_read_address_b = b1111;          //temp reg
+      
+            if (regfile_datain[0]){                 
+              game_fsm.d = game_fsm.LOSE_SET_TIMER_S10; //if timer zero display sad face
+              }
+            else{
+              game_fsm.d = game_fsm.DECREASE_GAME_TIMER; //if timer not zero decrease time
+              }  
+      
+          game_fsm.DECREASE_GAME_TIMER:
+              alufn = b000001;  //SUB
+              asel = b0000; 
+              bsel = b0010; //1
+              we_regfile = b1;
+              regfile_write_address = b1100; //write to game timer reg
+              regfile_read_address_a = b1100; //read from game timer reg
+              wdsel = b00;
+              
+              game_fsm.d = game_fsm.IDLE; //loop back to idle
+      
+
           /*
           RIGHT MOVEMENT CHECKER
           */
@@ -1027,7 +1044,6 @@ module game_CU (
               if (regfile_datain[0]){                      //direct read in
                 //if x = 0 directly go to checks
                 game_fsm.d = game_fsm.PULL_BIT_ROM;
-                //game_fsm.d = game_fsm.CONVERT_X_6BIT;  
               }
               else{
                 game_fsm.d = game_fsm.DOWN_DECREASEBY1; //if y!=0 DECREASE ycoord first
