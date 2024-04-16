@@ -797,12 +797,10 @@ module game_CU (
               game_fsm.d = game_fsm.UP_INCREASEBY1;
             } 
             
-            /*
-            //else if (right_button){ //TODO: CHANGE BACK TO ORIGINAL
-            if (right_button){ //TODO: DONT FORGET TO IMPLEMENT TO TEST!
+            else if (right_button){ 
                 //game_fsm.d = game_fsm.RIGHT_CHECKER;
               game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
-            }*/
+            }
         
             /*
             else if (down_button){
