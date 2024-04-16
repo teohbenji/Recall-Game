@@ -9,10 +9,10 @@ pin io_button[0] B28 pulldown; //reset
 pin io_button[1] B27 pulldown; //start
 
 //Limit switches, must be used in Bank C pink ports!!!
-pin io_button[2] C23 pulldown; //right
-pin io_button[3] C20 pulldown; //left
-pin io_button[4] C17 pulldown; //down
-pin io_button[5] C14 pulldown; //up
+pin io_button[2] C24 pulldown; //right
+pin io_button[3] C21 pulldown; //left
+pin io_button[4] C18 pulldown; //down
+pin io_button[5] C15 pulldown; //up
 
 pin io_led[0][0] B21;
 pin io_led[0][1] B20;
