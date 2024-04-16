@@ -1226,20 +1226,15 @@ module game_CU (
             game_fsm.d = game_fsm.IDLE;
       
            game_fsm.TEST_SHIFTER: 
-            //Convert to get current position of x in the row
-            //shifting right 6b10..0 by x
-            //SHR is shift A by B bits
-            alufn = b100001; //"A"
+            alufn = b100001; //"SHR"
             asel = b1001; //b100000
-            bsel = b0010; //test case: 1
+            bsel = b0100; //test case: 3 output: b000100
             we_regfile = b1;
-            regfile_write_address = b0110; //write directly to memtrail 0
+            regfile_write_address = b0110; //write directly to led memtrail 0
 
             wdsel = b00;
             ledsel = b01;
 
-            
-            //EXPPECTED OUTPUT b010000
             game_fsm.d = game_fsm.TEST_SHIFTER;
           
           //Increase x by 1
@@ -1260,8 +1255,7 @@ module game_CU (
             //game_fsm.d = game_fsm.CONVERT_X_6BIT;
             game_fsm.d = game_fsm.CONVERT_X_6BIT;
       
-          //CONVERSION OF X TO 6 BITS STATES
-          
+          /*CONVERSION OF X TO 6 BITS STATES
            game_fsm.CHECK_X_0: 
             alufn = b110011; //CMPEQ
             asel = b0000; 
@@ -1276,7 +1270,7 @@ module game_CU (
             //ledsel = b00;
     
             
-            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;*/
        
           
           
