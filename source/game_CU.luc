@@ -779,17 +779,19 @@ module game_CU (
         */
          
             //movement checker
-            /*
-            if (up_button){ //change to else if 
+            
+            //else if (up_button){ //TODO: CHANGE BACK TO ORIGINAL
+            if (up_button){ 
               //game_fsm.d = game_fsm.UP_CHECKER;
               game_fsm.d = game_fsm.UP_INCREASEBY1;
-            } */
+            } 
             
+            /*
             //else if (right_button){ //TODO: CHANGE BACK TO ORIGINAL
-            if (start_button){
+            if (right_button){
                 //game_fsm.d = game_fsm.RIGHT_CHECKER;
               game_fsm.d = game_fsm.RIGHT_INCREASEBY1;
-            }
+            }*/
         
             /*
             else if (down_button){
@@ -822,8 +824,8 @@ module game_CU (
             alufn = b011010; //"A"
             asel = b0000; 
             we_regfile = b1;
-            regfile_write_address = b0110; //update y0 trail
-            regfile_read_address_a = b1101; //reading reg 13
+            regfile_write_address = b0111; //update y1 trail
+            regfile_read_address_a = b0010; //reading y coord(0010), xcoord is 0001
             wdsel = b00;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
@@ -832,14 +834,26 @@ module game_CU (
           game_fsm.RIGHT_INCREASEBY1:
             alufn = b000000; //ADD
             asel = b0000; 
-            bsel = b0010 ; // 1
+            bsel = b0010; // 1
             we_regfile = b1;
             regfile_write_address = b0001; //write to xcoord
             regfile_read_address_a = b0001; //read from xcoord
             wdsel = b00;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT; 
+            game_fsm.d = game_fsm.CONVERT_X_6BIT;
+          
+          game_fsm.UP_INCREASEBY1:
+            alufn = b000000; //ADD
+            asel = b0000; 
+            bsel = b0010; // 1
+            we_regfile = b1;
+            regfile_write_address = b0010; //write to ycoord
+            regfile_read_address_a = b0010; //read from ycoord
+            wdsel = b00;
+    
+            //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
+            game_fsm.d = game_fsm.TEST_TRAIL_X;  
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
@@ -853,10 +867,33 @@ module game_CU (
             ledsel = b01;
 
             game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL; 
+      
+          game_fsm.CHECK_Y_0: 
+            alufn = b110011; //CMPEQ
+            asel = b0000; 
+            bsel = b0001 ;
+            we_regfile = b1;
+            regfile_write_address = b1111; // temp reg 15
+            regfile_read_address_a = b0010; //ycoord
+            wdsel = b00;
+            
+            game_fsm.d = game_fsm.CHECK_Y_0_BRANCH;
+          
+          
+          game_fsm.CHECK_Y_0_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+      
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
+              }
+              else{
+                //game_fsm.d = game_fsm.CHECK_Y_1; //TODO: REVERT BACK TO ORIGINAL
+                game_fsm.d = game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL;
+              }           
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
               alufn = b011110; //OR
-              asel = b0000; 
+              asel = b0000;  
               bsel = b0000;
               we_regfile = b1;
               regfile_write_address = b0110; //write to memtrail0
@@ -866,6 +903,19 @@ module game_CU (
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE; 
+          
+          game_fsm.Y1_UPDATE_DISPLAY_MEMTRAIL: 
+              alufn = b011110; //OR;
+              asel = b0000; 
+              bsel = b0000;
+              we_regfile = b1;
+              regfile_write_address = b0111; //write to memtrail 1
+              regfile_read_address_a = b0111; //read from memtrail 1
+              regfile_read_address_b = b1101; // read form temp reg 13
+              wdsel = b00;
+              ledsel = b01;
+      
+              game_fsm.d = game_fsm.IDLE;
           
           
           game_fsm.DISPLAY_SAD_FACE: 
