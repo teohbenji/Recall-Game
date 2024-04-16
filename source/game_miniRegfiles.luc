@@ -113,7 +113,7 @@ module game_miniRegfiles (
         b1010 : led_row5.d = data;
         b1011 : led_row6.d = data;
         b1100 : current_timer_gameplay.d = data;
-        b1101: xcoord_6bit.d = data;
+        b1101:  xcoord_6bit.d = data;
         b1111 : branch_temp_var.d = data;
       }
     }

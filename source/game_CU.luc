@@ -27,9 +27,7 @@ module game_CU (
   ) {
   
   .clk(clk){
-    fsm game_fsm={
-      TEST_SHIFTER,
-      
+    fsm game_fsm={      
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -144,7 +142,6 @@ module game_CU (
       Y1_UPDATE_DISPLAY_MEMTRAIL,
       TEST_TRAIL,
       TEST_TRAIL_X,
-      //TEST_SHIFTER,
       
       
       //End of round displays
@@ -1161,19 +1158,16 @@ module game_CU (
             else if (left_button){
                 game_fsm.d = game_fsm.LEFT_CHECKER;
             }
-            */
-            
+            */            
 
             else if (reset_button){ 
                 game_fsm.d = game_fsm.DISPLAY_SAD_FACE; 
-                
-            } else if (right_button){ //TODO: delete whole block when done testing
-                game_fsm.d = game_fsm.TEST_TRAIL; //TEST display 000111 on LEDs
-            }         
+             }      
             else{
                 game_fsm.d = game_fsm.IDLE; 
             }
            
+            /*DELETE TEST STATES BELOW ONCE DONE*/
            game_fsm.TEST_TRAIL:
             alufn = b011010; //"A"
             asel = b0110; //display 000111
@@ -1189,39 +1183,15 @@ module game_CU (
             game_fsm.d = game_fsm.IDLE;
            
           
-           
-          /*
-          game_fsm.UP_INCREASEYBY1: 
-            alufn = b000001; //ADD
-            asel = b0000; 
-            bsel = b0010 ; // 1
-            we_regfile = b1;
-            regfile_write_address = b0010; //ycoord
-            regfile_read_address_a = b0010; //ycoord
-            //regfile_read_address_b = ;
-            wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b01;
-    
-            //game_fsm.d = game_fsm.PULL_BIT_ROM;
-            game_fsm.d = game_fsm.CONVERT_X_6BIT;*/
-         
       
-          /*TEST STATES DELETE ONCE DONE*/
-            //TEST state to set value of mem trail
-          //directly display converted x 6 bit
+          
           game_fsm.TEST_TRAIL_X:
             alufn = b011010; //"A"
             asel = b0000; 
-           //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0110; //update y0 trail
-            regfile_read_address_a = b1101; //convert_x_6bit output
-            //regfile_read_address_b = ;
+            regfile_read_address_a = b0001; //reading from x coord
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
       
@@ -1231,41 +1201,35 @@ module game_CU (
             asel = b0000; 
             bsel = b0010 ; // 1
             we_regfile = b1;
-            regfile_write_address = b0001; //xcoord
-            regfile_read_address_a = b0001; //xcoord
-            //regfile_read_address_b = ;
+            regfile_write_address = b0001; //write to xcoord
+            regfile_read_address_a = b0001; //read from xcoord
             wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b01;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT;
-      
-      //TODO: CHANGE NAME TO CONVERT_X_6BIT    
-          game_fsm.TEST_SHIFTER: 
+            game_fsm.d = game_fsm.TEST_TRAIL_X; //TESTING IF X INCREASE WORKS
+        
+          game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
             asel = b1001; //b100000
-            bsel = b0001; //test case: 0 output: b100000
+            bsel = b0000; 
             we_regfile = b1;
-            regfile_write_address = b0110; //TODO: CURRENTLY led memtrail 0, CHANGE TO b1101
+            regfile_write_address = b1101; //write in temp reg 13
+            regfile_read_address_b = b0001; //read from x coord
 
             wdsel = b00;
             ledsel = b01;
 
-            game_fsm.d = game_fsm.TEST_SHIFTER;
+            game_fsm.d = game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL;
           
           game_fsm.Y0_UPDATE_DISPLAY_MEMTRAIL: 
-              alufn = b011110; //OR;
+              alufn = b011110; //OR
               asel = b0000; 
               bsel = b0000;
               we_regfile = b1;
-              regfile_write_address = b0110; 
-              regfile_read_address_a = b0110; //current 1st row
-              regfile_read_address_b = b1101; //temp reg 13
+              regfile_write_address = b0110; //write to memtrail0
+              regfile_read_address_a = b0110; // read from memtrail 0
+              regfile_read_address_b = b1101; //read from temp reg 13
               wdsel = b00;
-              //romsel = b001;
-              //outsel = b01;
               ledsel = b01;
       
               game_fsm.d = game_fsm.IDLE; 
