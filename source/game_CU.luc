@@ -169,8 +169,15 @@ module game_CU (
       TEST_TRAIL_X,
       
       
-      //End of round displays
-      DISPLAY_SAD_FACE    
+      /*
+      DISPLAY SAD FACE
+      */
+      LOSE_SET_TIMER_S10,
+      DISPLAY_SAD_FACE,
+      LOSE_CHECK_TIMER_0,
+      LOSE_CHECK_TIMER_0_BRANCH,
+      LOSE_DECREASE_TIMER_1
+        
       
       
       
@@ -828,7 +835,7 @@ module game_CU (
                       
 
             else if (reset_button){ 
-                game_fsm.d = game_fsm.DISPLAY_SAD_FACE; 
+                game_fsm.d = game_fsm.LOSE_SET_TIMER_S10; 
              }      
             else{
                 game_fsm.d = game_fsm.IDLE; 
@@ -1051,7 +1058,7 @@ module game_CU (
               regfile_read_address_b = b1111; // temp reg 15
               
               if (regfile_datain[0]){                      //direct read in
-                game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
+                game_fsm.d = game_fsm.LOSE_SET_TIMER_S10;
               }
               else{
                 game_fsm.d = game_fsm.CONVERT_X_6BIT;
@@ -1259,14 +1266,69 @@ module game_CU (
       
               game_fsm.d = game_fsm.IDLE;
           
+          /*
+          DISPLAY SAD FACE
+          */
+          //set map timer to 10s
+          game_fsm.LOSE_SET_TIMER_S10: 
+            alufn = b011010; //"A"
+            asel = b0111; //10
+            we_regfile = b1;
+            regfile_write_address = b0101; //write to reg5 map timer
+            wdsel = b00;
+            
+            game_fsm.d = game_fsm.DISPLAY_SAD_FACE;   
+          
+          
           game_fsm.DISPLAY_SAD_FACE: 
-              we_regfile = b0;
-              romsel = b110;
-              outsel = b01;
-              ledsel = b00;
-              colsel = b01;
+              we_regfile = b0;  
+              romsel = b110; //map 18: sad face
+              outsel = b01; //display full map
+              ledsel = b00; //display rom output
+              colsel = b01; //red color
               
-              game_fsm.d = game_fsm.START_NEW_GAME;
+              if (decrease_timer_mapdisplay){
+              game_fsm.d = game_fsm.LOSE_CHECK_TIMER_0;
+              }
+            
+              else {
+              game_fsm.d = game_fsm.DISPLAY_SAD_FACE;
+              }
+              
+            
+           game_fsm.LOSE_CHECK_TIMER_0: 
+              alufn = b110011; //CMPEQ
+              asel = b0000; 
+              bsel = b0001; //0
+              we_regfile = b1;
+              regfile_write_address = b1111; // temp reg 15
+              regfile_read_address_a = b0101;
+              wdsel = b00;
+  
+              game_fsm.d = game_fsm.LOSE_CHECK_TIMER_0_BRANCH; 
+          
+          
+          game_fsm.LOSE_CHECK_TIMER_0_BRANCH: 
+              regfile_read_address_b = b1111; // temp reg 15
+              
+              if (regfile_datain[0]){                      //direct read in
+                game_fsm.d = game_fsm.START_NEW_GAME;
+              }
+              else{
+                game_fsm.d = game_fsm.LOSE_DECREASE_TIMER_1;
+              }
+              
+              
+          game_fsm.LOSE_DECREASE_TIMER_1: 
+              alufn = b000001;  //SUB
+              asel = b0000; 
+              bsel = b0010; //1
+              we_regfile = b1;
+              regfile_write_address = b0101; //write to map timer
+              regfile_read_address_a = b0101; //read from map timer
+              wdsel = b00;
+              
+              game_fsm.d = game_fsm.DISPLAY_SAD_FACE;         
           
         }
       }
