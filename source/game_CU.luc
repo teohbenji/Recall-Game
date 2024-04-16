@@ -27,8 +27,7 @@ module game_CU (
   ) {
   
   .clk(clk){
-    fsm game_fsm={    
-      TEST_ALU,  
+    fsm game_fsm={     
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -824,19 +823,7 @@ module game_CU (
             game_fsm.d = game_fsm.C_CHECK_SCORE_0_BRANCH;  
               
         game_fsm.C_CHECK_SCORE_0_BRANCH: 
-            //alufn = CMPEQ;
-            //asel = b0000; 
-            //bsel = b0001 ;
-            //we_regfile = b1;
-            //regfile_write_address = b1100;
-            //regfile_read_address_a = b0000;
             regfile_read_address_b = b1111; // temp reg 15
-            //wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-            //seven_seg_1 = b00;
-            //seven_seg_2 = b00;
             
             if (regfile_datain[0]){                      //direct read in
               game_fsm.d = game_fsm.C_SET_TIMER_0_S10;
@@ -848,15 +835,9 @@ module game_CU (
         game_fsm.C_SET_TIMER_0_S10: 
             alufn = b011010; //"A"
             asel = b0111; 
-            //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0101;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            //ledsel = b00;
             
             game_fsm.d = game_fsm.MAP_C_DISPLAY;   
               
@@ -867,28 +848,13 @@ module game_CU (
             we_regfile = b1;
             regfile_write_address = b1111; // temp reg 15
             regfile_read_address_a = b0000;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
             
             game_fsm.d = game_fsm.C_CHECK_SCORE_1_BRANCH;  
               
         game_fsm.C_CHECK_SCORE_1_BRANCH: 
-            //alufn = CMPEQ;
-            //asel = b0000; 
-            //bsel = b0001 ;
-            //we_regfile = b1;
-            //regfile_write_address = b1100;
-            //regfile_read_address_a = b0101;
             regfile_read_address_b = b1111; // temp reg 15
-            //wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-            //seven_seg_1 = b00;
-            //seven_seg_2 = b00;
+
             
             if (regfile_datain[0]){                      //direct read in
               game_fsm.d = game_fsm.C_SET_TIMER_1_S7;
@@ -899,15 +865,9 @@ module game_CU (
          game_fsm.C_SET_TIMER_1_S7:
             alufn = b011010; //"A"
             asel = b0110; 
-            //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0101;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            //ledsel = b00;
             
             game_fsm.d = game_fsm.MAP_C_DISPLAY;   
               
@@ -915,29 +875,17 @@ module game_CU (
          game_fsm.C_SET_TIMER_2_S5:
             alufn = b011010; //"A"
             asel = b0101; 
-            //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0101;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            //ledsel = b00;
+
             
             game_fsm.d = game_fsm.MAP_C_DISPLAY;
               
           
           
           game_fsm.MAP_C_DISPLAY: 
-            //alufn = A;
-            //asel = b0010; 
-            //bsel = b0001 ;
             we_regfile = b0;
-            //regfile_write_address = b0011;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
-            //wdsel = b00;
             romsel = b011;
             outsel = b01;
             ledsel = b00;
@@ -957,30 +905,14 @@ module game_CU (
             we_regfile = b1;
             regfile_write_address = b1111; // temp reg 15
             regfile_read_address_a = b0101;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
             
             game_fsm.d = game_fsm.C_BRANCH_TIMER_0;
           
           
           
          game_fsm.C_BRANCH_TIMER_0: 
-            //alufn = CMPEQ;
-            //asel = b0000; 
-            //bsel = b0001 ;
-            //we_regfile = b1;
-            //regfile_write_address = b1100;
-            //regfile_read_address_a = b0101;
             regfile_read_address_b = b1111; // temp reg 15
-            //wdsel = b00;
-            //romsel = b001;
-            //outsel = b01;
-            //ledsel = b00;
-            //seven_seg_1 = b00;
-            //seven_seg_2 = b00;
             
             if (regfile_datain[0]){                      //direct read in
               game_fsm.d = game_fsm.DISPLAY_CORRECT_COLOUR;
@@ -1011,24 +943,12 @@ module game_CU (
             //bsel = b0001 ;
             we_regfile = b1;
             regfile_write_address = b0101;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
             wdsel = b00;
-            //romsel = b100;
-            //outsel = b01;
-            //ledsel = b00;
             game_fsm.d = game_fsm.DISPLAY_CORRECT_COLOUR;
   
           
           game_fsm.DISPLAY_CORRECT_COLOUR: 
-            //alufn = A;
-            //asel = b0010; 
-            //bsel = b0001 ;
             we_regfile = b0;
-            //regfile_write_address = b0011;
-            //regfile_read_address_a = ;
-            //regfile_read_address_b = ;
-            //wdsel = b00;
             romsel = b111;
             outsel = b01;
             ledsel = b00;
@@ -1059,20 +979,8 @@ module game_CU (
           
           
            game_fsm.CORRECT_COLOUR_BRANCH_TIMER_0: 
-              //alufn = CMPEQ;
-              //asel = b0000; 
-              //bsel = b0001 ;
-              //we_regfile = b1;
-              //regfile_write_address = b1100;
-              //regfile_read_address_a = b0101;
               regfile_read_address_b = b1111; // temp reg 15
-              //wdsel = b00;
-              //romsel = b001;
-              //outsel = b01;
-              //ledsel = b00;
-              //seven_seg_1 = b00;
-              //seven_seg_2 = b00;
-              
+
               if (regfile_datain[0]){                      //direct read in
                 game_fsm.d = game_fsm.DISPLAY_MEMORY_TRAILS;
               }
@@ -1182,19 +1090,6 @@ module game_CU (
             //outsel = b01;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
-           
-          game_fsm.TEST_ALU:
-            alufn = b100001; //"SHR"
-            asel = b1001; //b100000
-            bsel = b0001; //shift right by 1 bit -> b010000
-            we_regfile = b1;
-            regfile_write_address = b1101; //write in temp reg 13 for testing
-            //regfile_read_address_b = b0001; //read from x coord
-
-            wdsel = b00;
-            ledsel = b01;
-
-            game_fsm.d = game_fsm.TEST_TRAIL_X; //viewing converted x bit output now
       
           
           game_fsm.TEST_TRAIL_X:
@@ -1202,14 +1097,14 @@ module game_CU (
             asel = b0000; 
             we_regfile = b1;
             regfile_write_address = b0110; //update y0 trail
-            regfile_read_address_a = b1101; //reading output of convert_x_6bit
+            regfile_read_address_a = b0001; //reading XCOORD
             wdsel = b00;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
       
           //Increase x by 1
           game_fsm.RIGHT_INCREASEBY1:
-            alufn = b000001; //ADD
+            alufn = b000000; //ADD
             asel = b0000; 
             bsel = b0010 ; // 1
             we_regfile = b1;
@@ -1218,7 +1113,7 @@ module game_CU (
             wdsel = b00;
     
             //game_fsm.d = game_fsm.PULL_BIT_ROM; //TODO: CHANGE BACK TO ORIGINAL
-            game_fsm.d = game_fsm.CONVERT_X_6BIT; //TESTING IF X INCREASE WORKS
+            game_fsm.d = game_fsm.TEST_TRAIL_X; //TESTING IF X INCREASE WORKS
         
           game_fsm.CONVERT_X_6BIT: 
             alufn = b100001; //"SHR"
