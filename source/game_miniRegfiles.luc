@@ -56,6 +56,7 @@ module game_miniRegfiles (
       dff led_row6[16](#INIT(0));
       dff xcoord_6bit[16](#INIT(0)); 
       dff current_timer_gameplay[16](#INIT(0));
+      dff rom_data[16](#INIT(0));
       dff branch_temp_var[16](#INIT(0));
     }
   }
@@ -114,6 +115,7 @@ module game_miniRegfiles (
         b1011 : led_row6.d = data;
         b1100 : current_timer_gameplay.d = data;
         b1101:  xcoord_6bit.d = data;
+        b1110: rom_data.d = data;
         b1111 : branch_temp_var.d = data;
       }
     }
@@ -135,6 +137,7 @@ module game_miniRegfiles (
         b1011 : out_a = led_row6.q;
         b1100 : out_a = current_timer_gameplay.q;
         b1101 : out_a = xcoord_6bit.q;
+        b1110 : out_a = rom_data.q;
         b1111 : out_a = branch_temp_var.q;
         default : out_a = 0;
     }
@@ -155,6 +158,7 @@ module game_miniRegfiles (
         b1011 : out_b = led_row6.q;
         b1100 : out_b = current_timer_gameplay.q;
         b1101 : out_b = xcoord_6bit.q;
+        b1110 : out_b = rom_data.q;
         b1111 : out_b = branch_temp_var.q;
         default : out_b = 0;
     }
