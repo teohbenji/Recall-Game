@@ -28,6 +28,7 @@ module game_CU (
   
   .clk(clk){
     fsm game_fsm={
+      TEST_SHIFTER,
       START_NEW_GAME,
       
       RESET_SCORE_TO_0,
@@ -134,6 +135,7 @@ module game_CU (
       Y1_UPDATE_DISPLAY_MEMTRAIL,
       TEST_TRAIL,
       TEST_TRAIL_X,
+      
       
       //End of round displays
       DISPLAY_SAD_FACE    
@@ -1224,7 +1226,7 @@ module game_CU (
             //SHR is shift A by B bits
             alufn = b100001; //SHR
             asel = b1001; //6b10..0
-            bsel = b0000; //TODO: ORIGINAL CODE
+            //bsel = b0000; //TODO: ORIGINAL CODE
             bsel = b0010; //test case: 1, but original should be x
             we_regfile = b1;
             regfile_write_address = b1101; //store new position for memtrail in temp reg 13
@@ -1254,6 +1256,25 @@ module game_CU (
             //outsel = b01;
             ledsel = b01;
             game_fsm.d = game_fsm.IDLE;
+      
+           game_fsm.TEST_SHIFTER: 
+            //Convert to get current position of x in the row
+            //shifting right 6b10..0 by x
+            //SHR is shift A by B bits
+            alufn = b011010; //"A"
+            asel = b1001; //b111100
+            //bsel = b0010; //test case: 1
+            we_regfile = b1;
+            regfile_write_address = b0110; //write directly to memtrail 0
+
+            wdsel = b00;
+            ledsel = b01;
+
+            
+            //EXPPECTED OUTPUT b011110
+            game_fsm.d = game_fsm.TEST_SHIFTER;
+          
+         
       
            game_fsm.CHECK_Y_0: 
             alufn = b110011; //CMPEQ
