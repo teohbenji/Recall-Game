@@ -1186,8 +1186,7 @@ module game_CU (
          game_fsm.CHECK_SCORE_3: 
             alufn = b110011; //CMPEQ
             asel = b0000; 
-            //bsel = b0100; //3 TODO:UNCOMMENT AFTER TESTING
-            bsel = b0011; //currently 2, testing if win after 2nd round
+            bsel = b0100; //3 TODO:UNCOMMENT AFTER TESTING
             we_regfile = b1;
             regfile_write_address = b1111; // write to temp reg 15
             regfile_read_address_a = b0000; //read from score
