@@ -1,7 +1,3 @@
-[![Review Assignment Due Date](https://classroom.github.com/assets/deadline-readme-button-24ddc0f5d75046c5622901739e7c5dd533143b0c8e959d652212380cedb1ea36.svg)](https://classroom.github.com/a/5YTzVbxp)
-
-- [Public repository](https://github.com/teohbenji/1d-project-NEW)
-
 ## 50.002 1D Project Group 31
 
 1007238 Benjamin Lee Ze Perng
